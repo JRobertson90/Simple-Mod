@@ -1,0 +1,16 @@
+[
+{
+  "modid": "simple_mod_jayperdu_xaeroxe",
+  "name": "Simple Mod",
+  "description": "A simple mod",
+  "version": "1.0",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Jayperdu", "Xaeroxe"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
