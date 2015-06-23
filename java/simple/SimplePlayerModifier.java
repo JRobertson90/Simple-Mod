@@ -155,12 +155,4 @@ public class SimplePlayerModifier {
 	    }
 	}
 
-	@SubscribeEvent
-	public void onAttack(LivingAttackEvent event) {
-		if(event.source.isFireDamage() && event.entity instanceof EntityPlayer) {
-			if(Math.random() >= FIRE_RESIST_PERCENT) {
-				event.setCanceled(true);
-			}
-		}
-	}
 }
