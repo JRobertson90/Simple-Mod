@@ -8,9 +8,9 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid= SimpleMod.ID, name= SimpleMod.NAME, version = SimpleMod.VERSION)
 public class SimpleMod {
-	public static final String ID = "simple_mod_jayperdu_xaeroxe";
+	public static final String ID = "simple_mod";
 	public static final String NAME = "Simple Mod";
-	public static final String VERSION = "1.0";
+	public static final String VERSION = "1.0-1.8mc";
 
 	@EventHandler
     public void preInit(FMLPreInitializationEvent event) {
