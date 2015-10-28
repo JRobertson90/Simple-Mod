@@ -4,6 +4,6 @@
   "description": "A simple mod",
   "version": "1.0",
   "mcversion": "${mcversion}",
-  "authorList": [Jayperdu, Xaeroxe],
+  "authorList": [Jayperdu, Xaeroxe]
 }
 ]
