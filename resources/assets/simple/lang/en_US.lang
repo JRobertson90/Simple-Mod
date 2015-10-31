@@ -1,0 +1,101 @@
+item.chainCluster.name=Chain cluster
+
+item.wood_warHammer.name=Wooden Warhammer
+item.stone_warHammer.name=Stone Warhammer
+item.iron_warHammer.name=Iron Warhammer
+item.gold_warHammer.name=Gold Warhammer
+item.diamond_warHammer.name=Diamond Warhammer
+item.nether_warHammer.name=Netheranium Warhammer
+item.blue_warHammer.name=Lapis Lazuli Warhammer
+
+item.explosiveArrow.name=Explosive Arrow
+item.explosiveBow.name=Siege Bow
+item.sulfur.name=Sulfur
+item.potassium.name=Potassium
+item.nether_ingot.name=Netheranium Ingot
+
+item.wood_dagger.name=Wooden Dagger
+item.stone_dagger.name=Stone Dagger
+item.iron_dagger.name=Iron Dagger
+item.gold_dagger.name=Gold Dagger
+item.diamond_dagger.name=Diamond Dagger
+item.nether_dagger.name=Netheranium Dagger
+
+item.wood_poisonous_dagger.name=Poisonous Wooden Dagger
+item.stone_poisonous_dagger.name=Poisonous Stone Dagger
+item.iron_poisonous_dagger.name=Poisonous Iron Dagger
+item.gold_poisonous_dagger.name=Poisonous Gold Dagger
+item.diamond_poisonous_dagger.name=Poisonous Diamond Dagger
+item.nether_poisonous_dagger.name=Poisonous Netheranium Dagger
+
+item.camo_helm.name=Stealth Mask
+item.camo_shirt.name=Stealth Shirt
+item.camo_legs.name=Stealth Leggings
+item.camo_boots.name=Stealth Boots
+
+item.wood_shield.name=Wooden Shield
+item.stone_shield.name=Stone Shield
+item.iron_shield.name=Iron Shield
+item.gold_shield.name=Gold Shield
+item.diamond_shield.name=Diamond Shield
+item.nether_shield.name=Netheranium Shield
+item.blue_shield.name=Lapis Lazuli Shield
+
+tile.oreSulfur.name=Sulfur Ore
+tile.orePotassium.name=Potassium Ore
+tile.oreNetheranium.name=Netheranium Ore
+
+item.nether_helm.name=Netheranium Helmet
+item.nether_plate.name=Netheranium Chestplate
+item.nether_legs.name=Netheranium Leggings
+item.nether_boots.name=Netheranium Boots
+item.netherSword.name=Netheranium Sword
+item.netherPickaxe.name=Netheranium Pickaxe
+item.netherAxe.name=Netheranium Axe
+item.netherShovel.name=Netheranium Shovel
+item.netherHoe.name=Netheranium Hoe
+
+item.blueSword.name=Lapis Lazuli Sword
+item.bluePickaxe.name=Lapis Lazuli Pickaxe
+item.blueAxe.name=Lapis Lazuli Axe
+item.blueShovel.name=Lapis Lazuli Shovel
+item.blueHoe.name=Lapis Lazuli Hoe
+
+item.arrowTorch.name=Torch Arrow
+item.arrowPort.name=Arrow Port
+item.bowTorch.name=Torch Bow
+item.bowPort.name=Bow Port
+
+item.item_bed_black.name=Black Bed
+item.item_bed_red.name=Red Bed
+item.item_bed_green.name=Green Bed
+item.item_bed_brown.name=Brown Bed
+item.item_bed_blue.name=Blue Bed
+item.item_bed_purple.name=Purple Bed
+item.item_bed_cyan.name=Cyan Bed
+item.item_bed_light Gray.name=Light Gray Bed
+item.item_bed_gray.name=Gray Bed
+item.item_bed_pink.name=Pink Bed
+item.item_bed_lime.name=Lime Bed
+item.item_bed_yellow.name=Yellow Bed
+item.item_bed_light Blue.name=Light Blue Bed
+item.item_bed_magenta.name=Magenta Bed
+item.item_bed_orange.name=Orange Bed
+item.item_bed_white.name=White Bed
+
+tile.block_bed_black.name=Black Bed
+tile.block_bed_red.name=Red Bed
+tile.block_bed_green.name=Green Bed
+tile.block_bed_brown.name=Brown Bed
+tile.block_bed_blue.name=Blue Bed
+tile.block_bed_purple.name=Purple Bed
+tile.block_bed_cyan.name=Cyan Bed
+tile.block_bed_light Gray.name=Light Gray Bed
+tile.block_bed_gray.name=Gray Bed
+tile.block_bed_pink.name=Pink Bed
+tile.block_bed_lime.name=Lime Bed
+tile.block_bed_yellow.name=Yellow Bed
+tile.block_bed_light Blue.name=Light Blue Bed
+tile.block_bed_magenta.name=Magenta Bed
+tile.block_bed_orange.name=Orange Bed
+tile.block_bed_white.name=White Bed
