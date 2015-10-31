@@ -1,6 +1,6 @@
 package simple;
 
-import acm.proxy.Proxy;
+import simple.proxy.Proxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -14,7 +14,7 @@ public class SimpleMod {
 	public static final String NAME = "Simple Mod";
 	public static final String VERSION = "2.0-1.8mc";
 
-	@SidedProxy(clientSide="acm.proxy.client.ClientProxy", serverSide="acm.proxy.server.ServerProxy")
+	@SidedProxy(clientSide="simple.proxy.client.ClientProxy", serverSide="simple.proxy.server.ServerProxy")
 	public static Proxy proxy;
 
 	@Mod.Instance(value = SimpleMod.ID)
@@ -23,7 +23,6 @@ public class SimpleMod {
 	@EventHandler
     public void preInit(FMLPreInitializationEvent event) {
 		SimplePlayerModifier.setup();
-		proxy.registerEventHandlers();
 	}
 
 	@EventHandler

@@ -1,11 +1,11 @@
 package simple.entity;
 
 import java.util.List;
-
-import simple.item.SimpleItems;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockTorch;
 import net.minecraft.block.material.Material;
-import net.minecraft.enchantment.EnchantmentThorns;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.IProjectile;
@@ -13,49 +13,59 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.monster.EntityEnderman;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.packet.Packet70GameEvent;
+import net.minecraft.network.play.server.S2BPacketChangeGameState;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.EntityDamageSourceIndirect;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityTorchArrow extends Entity implements IProjectile {
 
-	/** 
-	 * Tries to place a torch at the given location, drops torch if can't stay.
-	 * Side values. Torches are placed on the INSIDE of a block of air.
-	 * The orientation values make it appear attached to an adjacent block.
-	 * Side values: 1 = west, 2 = east, 3 = north, 4 = south, 5 = center
-	 */
-	private boolean placeTorchArrow(int x, int y, int z, int side) {
-		if(this.worldObj.getBlockMaterial(x, y, z) != Material.water && this.worldObj.getBlockMaterial(x, y, z) != Material.lava)
-		{
-			this.worldObj.setBlock(x, y, z, Block.torchWood.blockID, side, 0);
-			this.worldObj.markBlockForUpdate(x, y, z);
+	private void handleTorchPlacement(BlockPos blockHit, EnumFacing sideHit) {
+		if(FMLCommonHandler.instance().getEffectiveSide().equals(Side.SERVER)) {
+			if (sideHit == EnumFacing.DOWN || ! placeTorchArrow(blockHit.offset(sideHit.getOpposite()), sideHit.getOpposite())) {
+				spawnItemTorchEntity(this.prevPosX, this.prevPosY, this.prevPosZ);
+			}
+			this.setDead();
+		}
+	}
+
+	/** Returns true if it succeeded. */
+	private boolean placeTorchArrow(BlockPos pos, EnumFacing side) {
+		Material blockMaterial = this.worldObj.getBlockState(pos).getBlock().getMaterial();
+		if(blockMaterial != Material.water && blockMaterial != Material.lava) {
+
+			IBlockState state = Blocks.torch.getBlockState().getBaseState().withProperty(BlockTorch.FACING, side);
+			this.worldObj.setBlockState(pos, state);
+
+			this.worldObj.markBlockForUpdate(pos);
 			return true;
 		}
 		return false;
 	}
-	
+
 	void spawnItemTorchEntity(double x, double y, double z)
 	{
 		EntityItem torch = new EntityItem(this.worldObj, x, y, z);
-		torch.setEntityItemStack(new ItemStack(Block.torchWood , 1));
+		torch.setEntityItemStack(new ItemStack(Blocks.torch , 1));
 		this.worldObj.spawnEntityInWorld(torch);
 	}
 
-	private int xTile = -1;
-	private int yTile = -1;
-	private int zTile = -1;
-	private int inTile;
+	private Block inTile;
 	private int inData;
 	private boolean inGround;
 
@@ -67,44 +77,48 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 
 	/** The owner of this arrow. */
 	public Entity shootingEntity;
+	private int ticksInGround;
 	private int ticksInAir;
 	private double damage = 2.0D;
 
 	/** The amount of knockback an arrow applies when it hits a mob. */
 	private int knockbackStrength;
+	private int xTile = -1;
+	private int yTile = -1;
+	private int zTile = -1;
+	private static final String __OBFID = "CL_00001715";
 
-	public EntityTorchArrow(World par1World)
+	public EntityTorchArrow(World worldIn)
 	{
-		super(par1World);
+		super(worldIn);
 		this.renderDistanceWeight = 10.0D;
 		this.setSize(0.5F, 0.5F);
 	}
 
-	public EntityTorchArrow(World par1World, double par2, double par4, double par6)
+	public EntityTorchArrow(World worldIn, double x, double y, double z)
 	{
-		super(par1World);
+		super(worldIn);
 		this.renderDistanceWeight = 10.0D;
 		this.setSize(0.5F, 0.5F);
-		this.setPosition(par2, par4, par6);
-		this.yOffset = 0.0F;
+		this.setPosition(x, y, z);
 	}
 
-	public EntityTorchArrow(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase par3EntityLivingBase, float par4, float par5)
+	public EntityTorchArrow(World worldIn, EntityLivingBase shooter, EntityLivingBase p_i1755_3_, float p_i1755_4_, float p_i1755_5_)
 	{
-		super(par1World);
+		super(worldIn);
 		this.renderDistanceWeight = 10.0D;
-		this.shootingEntity = par2EntityLivingBase;
+		this.shootingEntity = shooter;
 
-		if (par2EntityLivingBase instanceof EntityPlayer)
+		if (shooter instanceof EntityPlayer)
 		{
 			this.canBePickedUp = 1;
 		}
 
-		this.posY = par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight() - 0.10000000149011612D;
-		double d0 = par3EntityLivingBase.posX - par2EntityLivingBase.posX;
-		double d1 = par3EntityLivingBase.boundingBox.minY + par3EntityLivingBase.height / 3.0F - this.posY;
-		double d2 = par3EntityLivingBase.posZ - par2EntityLivingBase.posZ;
-		double d3 = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+		this.posY = shooter.posY + (double)shooter.getEyeHeight() - 0.10000000149011612D;
+		double d0 = p_i1755_3_.posX - shooter.posX;
+		double d1 = p_i1755_3_.getEntityBoundingBox().minY + (double)(p_i1755_3_.height / 3.0F) - this.posY;
+		double d2 = p_i1755_3_.posZ - shooter.posZ;
+		double d3 = (double)MathHelper.sqrt_double(d0 * d0 + d2 * d2);
 
 		if (d3 >= 1.0E-7D)
 		{
@@ -112,107 +126,98 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 			float f3 = (float)(-(Math.atan2(d1, d3) * 180.0D / Math.PI));
 			double d4 = d0 / d3;
 			double d5 = d2 / d3;
-			this.setLocationAndAngles(par2EntityLivingBase.posX + d4, this.posY, par2EntityLivingBase.posZ + d5, f2, f3);
-			this.yOffset = 0.0F;
-			float f4 = (float)d3 * 0.2F;
-			this.setThrowableHeading(d0, d1 + f4, d2, par4, par5);
+			this.setLocationAndAngles(shooter.posX + d4, this.posY, shooter.posZ + d5, f2, f3);
+			float f4 = (float)(d3 * 0.20000000298023224D);
+			this.setThrowableHeading(d0, d1 + (double)f4, d2, p_i1755_4_, p_i1755_5_);
 		}
 	}
 
-	public EntityTorchArrow(World par1World, EntityLivingBase par2EntityLivingBase, float par3)
+	public EntityTorchArrow(World worldIn, EntityLivingBase shooter, float p_i1756_3_)
 	{
-		super(par1World);
+		super(worldIn);
 		this.renderDistanceWeight = 10.0D;
-		this.shootingEntity = par2EntityLivingBase;
+		this.shootingEntity = shooter;
 
-		if (par2EntityLivingBase instanceof EntityPlayer)
+		if (shooter instanceof EntityPlayer)
 		{
 			this.canBePickedUp = 1;
 		}
 
 		this.setSize(0.5F, 0.5F);
-		this.setLocationAndAngles(par2EntityLivingBase.posX, par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight(), par2EntityLivingBase.posZ, par2EntityLivingBase.rotationYaw, par2EntityLivingBase.rotationPitch);
-		this.posX -= MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F;
+		this.setLocationAndAngles(shooter.posX, shooter.posY + (double)shooter.getEyeHeight(), shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
+		this.posX -= (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
 		this.posY -= 0.10000000149011612D;
-		this.posZ -= MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F;
+		this.posZ -= (double)(MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * 0.16F);
 		this.setPosition(this.posX, this.posY, this.posZ);
-		this.yOffset = 0.0F;
-		this.motionX = -MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI);
-		this.motionZ = MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI);
-		this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float)Math.PI));
-		this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, par3 * 1.5F, 1.0F);
+		this.motionX = (double)(-MathHelper.sin(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
+		this.motionZ = (double)(MathHelper.cos(this.rotationYaw / 180.0F * (float)Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float)Math.PI));
+		this.motionY = (double)(-MathHelper.sin(this.rotationPitch / 180.0F * (float)Math.PI));
+		this.setThrowableHeading(this.motionX, this.motionY, this.motionZ, p_i1756_3_ * 1.5F, 1.0F);
 	}
 
-	@Override
 	protected void entityInit()
 	{
-		this.dataWatcher.addObject(16, Byte.valueOf((byte)0));
+		this.dataWatcher.addObject(16, Byte.valueOf((byte) 0));
 	}
 
 	/**
 	 * Similar to setArrowHeading, it's point the throwable entity to a x, y, z direction.
+	 *
+	 * @param inaccuracy Higher means more error.
 	 */
-	@Override
-	public void setThrowableHeading(double par1, double par3, double par5, float par7, float par8)
+	public void setThrowableHeading(double x, double y, double z, float velocity, float inaccuracy)
 	{
-		float f2 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
-		par1 /= f2;
-		par3 /= f2;
-		par5 /= f2;
-		par1 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * par8;
-		par3 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * par8;
-		par5 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * par8;
-		par1 *= par7;
-		par3 *= par7;
-		par5 *= par7;
-		this.motionX = par1;
-		this.motionY = par3;
-		this.motionZ = par5;
-		float f3 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
-		this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
-		this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, f3) * 180.0D / Math.PI);
+		float f2 = MathHelper.sqrt_double(x * x + y * y + z * z);
+		x /= (double)f2;
+		y /= (double)f2;
+		z /= (double)f2;
+		x += this.rand.nextGaussian() * (double)(this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)inaccuracy;
+		y += this.rand.nextGaussian() * (double)(this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)inaccuracy;
+		z += this.rand.nextGaussian() * (double)(this.rand.nextBoolean() ? -1 : 1) * 0.007499999832361937D * (double)inaccuracy;
+		x *= (double)velocity;
+		y *= (double)velocity;
+		z *= (double)velocity;
+		this.motionX = x;
+		this.motionY = y;
+		this.motionZ = z;
+		float f3 = MathHelper.sqrt_double(x * x + z * z);
+		this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
+		this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f3) * 180.0D / Math.PI);
+		this.ticksInGround = 0;
 	}
 
-	@Override
 	@SideOnly(Side.CLIENT)
-
-	/**
-	 * Sets the position and rotation. Only difference from the other one is no bounding on the rotation. Args: posX,
-	 * posY, posZ, yaw, pitch
-	 */
-	public void setPositionAndRotation2(double par1, double par3, double par5, float par7, float par8, int par9)
+	public void func_180426_a(double p_180426_1_, double p_180426_3_, double p_180426_5_, float p_180426_7_, float p_180426_8_, int p_180426_9_, boolean p_180426_10_)
 	{
-		this.setPosition(par1, par3, par5);
-		this.setRotation(par7, par8);
+		this.setPosition(p_180426_1_, p_180426_3_, p_180426_5_);
+		this.setRotation(p_180426_7_, p_180426_8_);
 	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
 
 	/**
 	 * Sets the velocity to the args. Args: x, y, z
 	 */
-	public void setVelocity(double par1, double par3, double par5)
+	@SideOnly(Side.CLIENT)
+	public void setVelocity(double x, double y, double z)
 	{
-		this.motionX = par1;
-		this.motionY = par3;
-		this.motionZ = par5;
+		this.motionX = x;
+		this.motionY = y;
+		this.motionZ = z;
 
 		if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F)
 		{
-			float f = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
-			this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
-			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, f) * 180.0D / Math.PI);
+			float f = MathHelper.sqrt_double(x * x + z * z);
+			this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(x, z) * 180.0D / Math.PI);
+			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(y, (double)f) * 180.0D / Math.PI);
 			this.prevRotationPitch = this.rotationPitch;
 			this.prevRotationYaw = this.rotationYaw;
 			this.setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+			this.ticksInGround = 0;
 		}
 	}
 
 	/**
 	 * Called to update the entity's position/logic.
 	 */
-	@Override
 	public void onUpdate()
 	{
 		super.onUpdate();
@@ -221,17 +226,19 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 		{
 			float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 			this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
-			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, f) * 180.0D / Math.PI);
+			this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f) * 180.0D / Math.PI);
 		}
 
-		int i = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
+		BlockPos blockpos = new BlockPos(this.xTile, this.yTile, this.zTile);
+		IBlockState iblockstate = this.worldObj.getBlockState(blockpos);
+		Block block = iblockstate.getBlock();
 
-		if (i > 0)
+		if (block.getMaterial() != Material.air)
 		{
-			Block.blocksList[i].setBlockBoundsBasedOnState(this.worldObj, this.xTile, this.yTile, this.zTile);
-			AxisAlignedBB axisalignedbb = Block.blocksList[i].getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
+			block.setBlockBoundsBasedOnState(this.worldObj, blockpos);
+			AxisAlignedBB axisalignedbb = block.getCollisionBoundingBox(this.worldObj, blockpos, iblockstate);
 
-			if (axisalignedbb != null && axisalignedbb.isVecInside(this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ)))
+			if (axisalignedbb != null && axisalignedbb.isVecInside(new Vec3(this.posX, this.posY, this.posZ)))
 			{
 				this.inGround = true;
 			}
@@ -244,41 +251,60 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 
 		if (this.inGround)
 		{
-			this.setDead();
+			int j = block.getMetaFromState(iblockstate);
+
+			if (block == this.inTile && j == this.inData)
+			{
+				++this.ticksInGround;
+
+				if (this.ticksInGround >= 1200)
+				{
+					this.setDead();
+				}
+			}
+			else
+			{
+				this.inGround = false;
+				this.motionX *= (double)(this.rand.nextFloat() * 0.2F);
+				this.motionY *= (double)(this.rand.nextFloat() * 0.2F);
+				this.motionZ *= (double)(this.rand.nextFloat() * 0.2F);
+				this.ticksInGround = 0;
+				this.ticksInAir = 0;
+			}
 		}
 		else
 		{
 			++this.ticksInAir;
-			Vec3 vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
-			Vec3 vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-			MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks_do_do(vec3, vec31, false, true);
-			vec3 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX, this.posY, this.posZ);
-			vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+			Vec3 vec31 = new Vec3(this.posX, this.posY, this.posZ);
+			Vec3 vec3 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+			MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec31, vec3, false, true, false);
+			vec31 = new Vec3(this.posX, this.posY, this.posZ);
+			vec3 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 
 			if (movingobjectposition != null)
 			{
-				vec31 = this.worldObj.getWorldVec3Pool().getVecFromPool(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+				vec3 = new Vec3(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
 			}
 
 			Entity entity = null;
-			List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+			List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
 			double d0 = 0.0D;
-			int l;
+			int i;
 			float f1;
 
-			for (l = 0; l < list.size(); ++l)
+			for (i = 0; i < list.size(); ++i)
 			{
-				Entity entity1 = (Entity)list.get(l);
+				Entity entity1 = (Entity)list.get(i);
 
 				if (entity1.canBeCollidedWith() && (entity1 != this.shootingEntity || this.ticksInAir >= 5))
 				{
 					f1 = 0.3F;
-					AxisAlignedBB axisalignedbb1 = entity1.boundingBox.expand(f1, f1, f1);
-					MovingObjectPosition movingobjectposition1 = axisalignedbb1.calculateIntercept(vec3, vec31);
+					AxisAlignedBB axisalignedbb1 = entity1.getEntityBoundingBox().expand((double)f1, (double)f1, (double)f1);
+					MovingObjectPosition movingobjectposition1 = axisalignedbb1.calculateIntercept(vec31, vec3);
 
 					if (movingobjectposition1 != null)
 					{
-						double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+						double d1 = vec31.distanceTo(movingobjectposition1.hitVec);
 
 						if (d1 < d0 || d0 == 0.0D)
 						{
@@ -306,28 +332,29 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 
 			float f2;
 			float f3;
+			float f4;
 
 			if (movingobjectposition != null)
 			{
 				if (movingobjectposition.entityHit != null)
 				{
 					f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-					int i1 = MathHelper.ceiling_double_int(f2 * this.damage);
+					int k = MathHelper.ceiling_double_int((double)f2 * this.damage);
 
 					if (this.getIsCritical())
 					{
-						i1 += this.rand.nextInt(i1 / 2 + 2);
+						k += this.rand.nextInt(k / 2 + 2);
 					}
 
-					DamageSource damagesource = null;
+					DamageSource damagesource;
 
 					if (this.shootingEntity == null)
 					{
-						damagesource = causeArrowDamage(this, this);
+						damagesource = this.causeArrowDamage(this, this);
 					}
 					else
 					{
-						damagesource = causeArrowDamage(this, this.shootingEntity);
+						damagesource = this.causeArrowDamage(this, this.shootingEntity);
 					}
 
 					if (this.isBurning() && !(movingobjectposition.entityHit instanceof EntityEnderman))
@@ -335,7 +362,7 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 						movingobjectposition.entityHit.setFire(5);
 					}
 
-					if (movingobjectposition.entityHit.attackEntityFrom(damagesource, i1))
+					if (movingobjectposition.entityHit.attackEntityFrom(damagesource, (float)k))
 					{
 						if (movingobjectposition.entityHit instanceof EntityLivingBase)
 						{
@@ -348,23 +375,23 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 
 							if (this.knockbackStrength > 0)
 							{
-								f3 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+								f4 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 
-								if (f3 > 0.0F)
+								if (f4 > 0.0F)
 								{
-									movingobjectposition.entityHit.addVelocity(this.motionX * this.knockbackStrength * 0.6000000238418579D / f3, 0.1D, this.motionZ * this.knockbackStrength * 0.6000000238418579D / f3);
+									movingobjectposition.entityHit.addVelocity(this.motionX * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4, 0.1D, this.motionZ * (double)this.knockbackStrength * 0.6000000238418579D / (double)f4);
 								}
 							}
 
-							if (this.shootingEntity != null)
+							if (this.shootingEntity instanceof EntityLivingBase)
 							{
-								EnchantmentThorns.func_92096_a(this.shootingEntity, entitylivingbase, this.rand);
-								spawnItemTorchEntity(this.prevPosX, this.prevPosY, this.prevPosZ);
+								EnchantmentHelper.func_151384_a(entitylivingbase, this.shootingEntity);
+								EnchantmentHelper.func_151385_b((EntityLivingBase)this.shootingEntity, entitylivingbase);
 							}
 
 							if (this.shootingEntity != null && movingobjectposition.entityHit != this.shootingEntity && movingobjectposition.entityHit instanceof EntityPlayer && this.shootingEntity instanceof EntityPlayerMP)
 							{
-								((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.sendPacketToPlayer(new Packet70GameEvent(6, 0));
+								((EntityPlayerMP)this.shootingEntity).playerNetServerHandler.sendPacket(new S2BPacketChangeGameState(6, 0.0F));
 							}
 						}
 
@@ -387,85 +414,38 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 				}
 				else
 				{
-					
-					this.xTile = movingobjectposition.blockX;
-					this.yTile = movingobjectposition.blockY;
-					this.zTile = movingobjectposition.blockZ;
-					
-					
-					/*-----------------------------
-					 *  Torch Placing Code Begin
-					  ----------------------------*/
-
-					// Side values. Torches are placed on the INSIDE of a block of air.
-					//The orientation values make it appear attached to an adjacent block.
-
-					final int WEST = 1;
-					final int EAST = 2;
-					final int NORTH = 3;
-					final int SOUTH = 4;
-					final int CENTER = 5;
-
-					if(FMLCommonHandler.instance().getEffectiveSide().equals(Side.SERVER))
-					{
-						boolean torchPlaced = false;
-						int sideHit = movingobjectposition.sideHit;
-						if(sideHit == 1)
-						{
-							torchPlaced = placeTorchArrow(xTile,yTile+1,zTile,CENTER);
-						}
-						else if(sideHit == 2)
-						{
-							torchPlaced = placeTorchArrow(xTile,yTile,zTile-1,SOUTH);
-						}
-						else if(sideHit == 3)
-						{
-							torchPlaced = placeTorchArrow(xTile,yTile,zTile+1,NORTH);
-						}
-						else if(sideHit == 4)
-						{
-							torchPlaced = placeTorchArrow(xTile-1,yTile,zTile,EAST);
-						}
-						else if(sideHit == 5)
-						{
-							torchPlaced = placeTorchArrow(xTile+1,yTile,zTile,WEST);
-						}
-						if(sideHit == 0 || !torchPlaced)
-						{
-							spawnItemTorchEntity(this.prevPosX, this.prevPosY, this.prevPosZ);
-						}
-					}
-					
-					/*-----------------------------
-					 *  Torch Placing Code End
-					  ----------------------------*/
-					
-					this.inTile = this.worldObj.getBlockId(this.xTile, this.yTile, this.zTile);
-					this.inData = this.worldObj.getBlockMetadata(this.xTile, this.yTile, this.zTile);
-					this.motionX = ((float)(movingobjectposition.hitVec.xCoord - this.posX));
-					this.motionY = ((float)(movingobjectposition.hitVec.yCoord - this.posY));
-					this.motionZ = ((float)(movingobjectposition.hitVec.zCoord - this.posZ));
-					f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
-					this.posX -= this.motionX / f2 * 0.05000000074505806D;
-					this.posY -= this.motionY / f2 * 0.05000000074505806D;
-					this.posZ -= this.motionZ / f2 * 0.05000000074505806D;
+					BlockPos blockpos1 = movingobjectposition.getBlockPos();
+					this.xTile = blockpos1.getX();
+					this.yTile = blockpos1.getY();
+					this.zTile = blockpos1.getZ();
+					iblockstate = this.worldObj.getBlockState(blockpos1);
+					this.inTile = iblockstate.getBlock();
+					this.inData = this.inTile.getMetaFromState(iblockstate);
+					this.motionX = (double)((float)(movingobjectposition.hitVec.xCoord - this.posX));
+					this.motionY = (double)((float)(movingobjectposition.hitVec.yCoord - this.posY));
+					this.motionZ = (double)((float)(movingobjectposition.hitVec.zCoord - this.posZ));
+					f3 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+					this.posX -= this.motionX / (double)f3 * 0.05000000074505806D;
+					this.posY -= this.motionY / (double)f3 * 0.05000000074505806D;
+					this.posZ -= this.motionZ / (double)f3 * 0.05000000074505806D;
 					this.playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
 					this.inGround = true;
 					this.arrowShake = 7;
 					this.setIsCritical(false);
 
-					if (this.inTile != 0)
+					if (this.inTile.getMaterial() != Material.air)
 					{
-						Block.blocksList[this.inTile].onEntityCollidedWithBlock(this.worldObj, this.xTile, this.yTile, this.zTile, this);
+						this.inTile.onEntityCollidedWithBlock(this.worldObj, blockpos1, iblockstate, this);
+						handleTorchPlacement(new BlockPos(xTile, yTile, zTile), movingobjectposition.sideHit);
 					}
 				}
 			}
 
 			if (this.getIsCritical())
 			{
-				for (l = 0; l < 4; ++l)
+				for (i = 0; i < 4; ++i)
 				{
-					this.worldObj.spawnParticle("crit", this.posX + this.motionX * l / 4.0D, this.posY + this.motionY * l / 4.0D, this.posZ + this.motionZ * l / 4.0D, -this.motionX, -this.motionY + 0.2D, -this.motionZ);
+					this.worldObj.spawnParticle(EnumParticleTypes.CRIT, this.posX + this.motionX * (double)i / 4.0D, this.posY + this.motionY * (double)i / 4.0D, this.posZ + this.motionZ * (double)i / 4.0D, -this.motionX, -this.motionY + 0.2D, -this.motionZ, new int[0]);
 				}
 			}
 
@@ -475,7 +455,7 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 			f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 			this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
 
-			for (this.rotationPitch = (float)(Math.atan2(this.motionY, f2) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+			for (this.rotationPitch = (float)(Math.atan2(this.motionY, (double)f2) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
 			{
 				;
 			}
@@ -497,24 +477,29 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 
 			this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
 			this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-			float f4 = 0.99F;
+			f3 = 0.99F;
 			f1 = 0.05F;
 
 			if (this.isInWater())
 			{
-				for (int j1 = 0; j1 < 4; ++j1)
+				for (int l = 0; l < 4; ++l)
 				{
-					f3 = 0.25F;
-					this.worldObj.spawnParticle("bubble", this.posX - this.motionX * f3, this.posY - this.motionY * f3, this.posZ - this.motionZ * f3, this.motionX, this.motionY, this.motionZ);
+					f4 = 0.25F;
+					this.worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, this.posX - this.motionX * (double)f4, this.posY - this.motionY * (double)f4, this.posZ - this.motionZ * (double)f4, this.motionX, this.motionY, this.motionZ, new int[0]);
 				}
 
-				f4 = 0.8F;
+				f3 = 0.6F;
 			}
 
-			this.motionX *= f4;
-			this.motionY *= f4;
-			this.motionZ *= f4;
-			this.motionY -= f1;
+			if (this.isWet())
+			{
+				this.extinguish();
+			}
+
+			this.motionX *= (double)f3;
+			this.motionY *= (double)f3;
+			this.motionZ *= (double)f3;
+			this.motionY -= (double)f1;
 			this.setPosition(this.posX, this.posY, this.posZ);
 			this.doBlockCollisions();
 		}
@@ -523,60 +508,69 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 	/**
 	 * (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+	public void writeEntityToNBT(NBTTagCompound tagCompound)
 	{
-		par1NBTTagCompound.setShort("xTile", (short)this.xTile);
-		par1NBTTagCompound.setShort("yTile", (short)this.yTile);
-		par1NBTTagCompound.setShort("zTile", (short)this.zTile);
-		par1NBTTagCompound.setByte("inTile", (byte)this.inTile);
-		par1NBTTagCompound.setByte("inData", (byte)this.inData);
-		par1NBTTagCompound.setByte("shake", (byte)this.arrowShake);
-		par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
-		par1NBTTagCompound.setByte("pickup", (byte)this.canBePickedUp);
-		par1NBTTagCompound.setDouble("damage", this.damage);
+		tagCompound.setShort("xTile", (short)this.xTile);
+		tagCompound.setShort("yTile", (short)this.yTile);
+		tagCompound.setShort("zTile", (short)this.zTile);
+		tagCompound.setShort("life", (short)this.ticksInGround);
+		ResourceLocation resourcelocation = (ResourceLocation)Block.blockRegistry.getNameForObject(this.inTile);
+		tagCompound.setString("inTile", resourcelocation == null ? "" : resourcelocation.toString());
+		tagCompound.setByte("inData", (byte)this.inData);
+		tagCompound.setByte("shake", (byte)this.arrowShake);
+		tagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
+		tagCompound.setByte("pickup", (byte)this.canBePickedUp);
+		tagCompound.setDouble("damage", this.damage);
 	}
 
 	/**
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readEntityFromNBT(NBTTagCompound tagCompund)
 	{
-		this.xTile = par1NBTTagCompound.getShort("xTile");
-		this.yTile = par1NBTTagCompound.getShort("yTile");
-		this.zTile = par1NBTTagCompound.getShort("zTile");
-		this.inTile = par1NBTTagCompound.getByte("inTile") & 255;
-		this.inData = par1NBTTagCompound.getByte("inData") & 255;
-		this.arrowShake = par1NBTTagCompound.getByte("shake") & 255;
-		this.inGround = par1NBTTagCompound.getByte("inGround") == 1;
+		this.xTile = tagCompund.getShort("xTile");
+		this.yTile = tagCompund.getShort("yTile");
+		this.zTile = tagCompund.getShort("zTile");
+		this.ticksInGround = tagCompund.getShort("life");
 
-		if (par1NBTTagCompound.hasKey("damage"))
+		if (tagCompund.hasKey("inTile", 8))
 		{
-			this.damage = par1NBTTagCompound.getDouble("damage");
+			this.inTile = Block.getBlockFromName(tagCompund.getString("inTile"));
+		}
+		else
+		{
+			this.inTile = Block.getBlockById(tagCompund.getByte("inTile") & 255);
 		}
 
-		if (par1NBTTagCompound.hasKey("pickup"))
+		this.inData = tagCompund.getByte("inData") & 255;
+		this.arrowShake = tagCompund.getByte("shake") & 255;
+		this.inGround = tagCompund.getByte("inGround") == 1;
+
+		if (tagCompund.hasKey("damage", 99))
 		{
-			this.canBePickedUp = par1NBTTagCompound.getByte("pickup");
+			this.damage = tagCompund.getDouble("damage");
 		}
-		else if (par1NBTTagCompound.hasKey("player"))
+
+		if (tagCompund.hasKey("pickup", 99))
 		{
-			this.canBePickedUp = par1NBTTagCompound.getBoolean("player") ? 1 : 0;
+			this.canBePickedUp = tagCompund.getByte("pickup");
+		}
+		else if (tagCompund.hasKey("player", 99))
+		{
+			this.canBePickedUp = tagCompund.getBoolean("player") ? 1 : 0;
 		}
 	}
 
 	/**
 	 * Called by a player entity when they collide with an entity
 	 */
-	@Override
-	public void onCollideWithPlayer(EntityPlayer par1EntityPlayer)
+	public void onCollideWithPlayer(EntityPlayer entityIn)
 	{
 		if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0)
 		{
-			boolean flag = this.canBePickedUp == 1 || this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode;
+			boolean flag = this.canBePickedUp == 1 || this.canBePickedUp == 2 && entityIn.capabilities.isCreativeMode;
 
-			if (this.canBePickedUp == 1 && !par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(SimpleItems.arrow_torch, 1)))
+			if (this.canBePickedUp == 1 && !entityIn.inventory.addItemStackToInventory(new ItemStack(Items.arrow, 1)))
 			{
 				flag = false;
 			}
@@ -584,7 +578,7 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 			if (flag)
 			{
 				this.playSound("random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
-				par1EntityPlayer.onItemPickup(this, 1);
+				entityIn.onItemPickup(this, 1);
 				this.setDead();
 			}
 		}
@@ -594,22 +588,14 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 	 * returns if this entity triggers Block.onEntityWalking on the blocks they walk on. used for spiders and wolves to
 	 * prevent them from trampling crops
 	 */
-	@Override
 	protected boolean canTriggerWalking()
 	{
 		return false;
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public float getShadowSize()
+	public void setDamage(double p_70239_1_)
 	{
-		return 0.0F;
-	}
-
-	public void setDamage(double par1)
-	{
-		this.damage = par1;
+		this.damage = p_70239_1_;
 	}
 
 	public double getDamage()
@@ -620,15 +606,14 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 	/**
 	 * Sets the amount of knockback the arrow applies when it hits a mob.
 	 */
-	public void setKnockbackStrength(int par1)
+	public void setKnockbackStrength(int p_70240_1_)
 	{
-		this.knockbackStrength = par1;
+		this.knockbackStrength = p_70240_1_;
 	}
 
 	/**
 	 * If returns false, the item will not inflict any damage against entities.
 	 */
-	@Override
 	public boolean canAttackWithItem()
 	{
 		return false;
@@ -637,11 +622,11 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 	/**
 	 * Whether the arrow has a stream of critical hit particles flying behind it.
 	 */
-	public void setIsCritical(boolean par1)
+	public void setIsCritical(boolean p_70243_1_)
 	{
 		byte b0 = this.dataWatcher.getWatchableObjectByte(16);
 
-		if (par1)
+		if (p_70243_1_)
 		{
 			this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 | 1)));
 		}
@@ -663,7 +648,7 @@ public class EntityTorchArrow extends Entity implements IProjectile {
 	/**
 	 * returns EntityDamageSourceIndirect of an arrow
 	 */
-	public static DamageSource causeArrowDamage(EntityTorchArrow par0EntityArrow, Entity par1Entity)
+	public static DamageSource causeArrowDamage(simple.entity.EntityTorchArrow par0EntityArrow, Entity par1Entity)
 	{
 		return (new EntityDamageSourceIndirect("arrow", par0EntityArrow, par1Entity)).setProjectile();
 	}

@@ -1,7 +1,9 @@
 package simple.proxy.client;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -12,8 +14,12 @@ import org.lwjgl.opengl.GL12;
 import simple.entity.EntityTorchArrow;
 
 public class RenderTorchArrow extends Render {
-	
+
 	private static final ResourceLocation arrowTextures = new ResourceLocation("acm:textures/entity/arrow_torch.png");
+
+    public RenderTorchArrow(RenderManager renderManager) {
+        super(renderManager);
+    }
 
     public void renderArrow(EntityTorchArrow par1EntityArrow, double par2, double par4, double par6, float par8, float par9)
     {
@@ -22,7 +28,7 @@ public class RenderTorchArrow extends Render {
         GL11.glTranslatef((float)par2, (float)par4, (float)par6);
         GL11.glRotatef(par1EntityArrow.prevRotationYaw + (par1EntityArrow.rotationYaw - par1EntityArrow.prevRotationYaw) * par9 - 90.0F, 0.0F, 1.0F, 0.0F);
         GL11.glRotatef(par1EntityArrow.prevRotationPitch + (par1EntityArrow.rotationPitch - par1EntityArrow.prevRotationPitch) * par9, 0.0F, 0.0F, 1.0F);
-        Tessellator tessellator = Tessellator.instance;
+        Tessellator tessellator = Tessellator.getInstance();
         byte b0 = 0;
         float f2 = 0.0F;
         float f3 = 0.5F;
@@ -46,29 +52,27 @@ public class RenderTorchArrow extends Render {
         GL11.glScalef(f10, f10, f10);
         GL11.glTranslatef(-4.0F, 0.0F, 0.0F);
         GL11.glNormal3f(f10, 0.0F, 0.0F);
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(-7.0D, -2.0D, -2.0D, f6, f8);
-        tessellator.addVertexWithUV(-7.0D, -2.0D, 2.0D, f7, f8);
-        tessellator.addVertexWithUV(-7.0D, 2.0D, 2.0D, f7, f9);
-        tessellator.addVertexWithUV(-7.0D, 2.0D, -2.0D, f6, f9);
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        worldRenderer.addVertexWithUV(-7.0D, -2.0D, -2.0D, f6, f8);
+        worldRenderer.addVertexWithUV(-7.0D, -2.0D, 2.0D, f7, f8);
+        worldRenderer.addVertexWithUV(-7.0D, 2.0D, 2.0D, f7, f9);
+        worldRenderer.addVertexWithUV(-7.0D, 2.0D, -2.0D, f6, f9);
         tessellator.draw();
         GL11.glNormal3f(-f10, 0.0F, 0.0F);
-        tessellator.startDrawingQuads();
-        tessellator.addVertexWithUV(-7.0D, 2.0D, -2.0D, f6, f8);
-        tessellator.addVertexWithUV(-7.0D, 2.0D, 2.0D, f7, f8);
-        tessellator.addVertexWithUV(-7.0D, -2.0D, 2.0D, f7, f9);
-        tessellator.addVertexWithUV(-7.0D, -2.0D, -2.0D, f6, f9);
+        worldRenderer.addVertexWithUV(-7.0D, 2.0D, -2.0D, f6, f8);
+        worldRenderer.addVertexWithUV(-7.0D, 2.0D, 2.0D, f7, f8);
+        worldRenderer.addVertexWithUV(-7.0D, -2.0D, 2.0D, f7, f9);
+        worldRenderer.addVertexWithUV(-7.0D, -2.0D, -2.0D, f6, f9);
         tessellator.draw();
 
         for (int i = 0; i < 4; ++i)
         {
             GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
             GL11.glNormal3f(0.0F, 0.0F, f10);
-            tessellator.startDrawingQuads();
-            tessellator.addVertexWithUV(-8.0D, -2.0D, 0.0D, f2, f4);
-            tessellator.addVertexWithUV(8.0D, -2.0D, 0.0D, f3, f4);
-            tessellator.addVertexWithUV(8.0D, 2.0D, 0.0D, f3, f5);
-            tessellator.addVertexWithUV(-8.0D, 2.0D, 0.0D, f2, f5);
+            worldRenderer.addVertexWithUV(-8.0D, -2.0D, 0.0D, f2, f4);
+            worldRenderer.addVertexWithUV(8.0D, -2.0D, 0.0D, f3, f4);
+            worldRenderer.addVertexWithUV(8.0D, 2.0D, 0.0D, f3, f5);
+            worldRenderer.addVertexWithUV(-8.0D, 2.0D, 0.0D, f2, f5);
             tessellator.draw();
         }
 
@@ -78,7 +82,7 @@ public class RenderTorchArrow extends Render {
 
     protected ResourceLocation getArrowTextures(EntityTorchArrow par1EntityArrow)
     {
-        return this.arrowTextures;
+        return arrowTextures;
     }
 
     /**

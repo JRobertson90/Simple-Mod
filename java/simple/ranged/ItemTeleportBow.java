@@ -1,61 +1,49 @@
 package simple.ranged;
 
-import net.minecraft.client.renderer.texture.IconRegister;
+import simple.entity.EntityTeleportArrow;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Items;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Icon;
+import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.ArrowLooseEvent;
-import net.minecraftforge.event.entity.player.ArrowNockEvent;
-import simple.entity.EntityTeleportArrow;
-import simple.item.SimpleItems;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class ItemTeleportBow extends Item {
-	
-	public static final String[] bowPullIconNameArray = new String[] {"pulling_0", "pulling_1", "pulling_2"};
-    @SideOnly(Side.CLIENT)
-    private Icon[] iconArray;
+public class ItemTeleportBow extends Item
+{
+    public static final String[] bowPullIconNameArray = new String[] {"pulling_0", "pulling_1", "pulling_2"};
+    private static final String __OBFID = "CL_00001777";
 
-    public ItemTeleportBow(int par1)
+    public ItemTeleportBow()
     {
-        super(par1);
         this.maxStackSize = 1;
         this.setMaxDamage(384);
         this.setCreativeTab(CreativeTabs.tabCombat);
     }
 
     /**
-     * called when the player releases the use item button. Args: itemstack, world, entityplayer, itemInUseCount
+     * Called when the player stops using an Item (stops holding the right mouse button).
+     *
+     * @param timeLeft The amount of ticks left before the using would have been complete
      */
-    @Override
-	public void onPlayerStoppedUsing(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer, int par4)
+    public void onPlayerStoppedUsing(ItemStack stack, World worldIn, EntityPlayer playerIn, int timeLeft)
     {
-        int j = this.getMaxItemUseDuration(par1ItemStack) - par4;
-
-        ArrowLooseEvent event = new ArrowLooseEvent(par3EntityPlayer, par1ItemStack, j);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
-        {
-            return;
-        }
+        int j = this.getMaxItemUseDuration(stack) - timeLeft;
+        net.minecraftforge.event.entity.player.ArrowLooseEvent event = new net.minecraftforge.event.entity.player.ArrowLooseEvent(playerIn, stack, j);
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return;
         j = event.charge;
 
-        boolean flag = par3EntityPlayer.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, par1ItemStack) > 0;
+        boolean flag = playerIn.capabilities.isCreativeMode || EnchantmentHelper.getEnchantmentLevel(Enchantment.infinity.effectId, stack) > 0;
 
-        if (flag || par3EntityPlayer.inventory.hasItem(SimpleItems.arrow_teleport.itemID))
+        if (flag || playerIn.inventory.hasItem(Items.arrow))
         {
-            float f = j / 20.0F;
+            float f = (float)j / 20.0F;
             f = (f * f + f * 2.0F) / 3.0F;
 
-            if (f < 0.1D)
+            if ((double)f < 0.1D)
             {
                 return;
             }
@@ -65,34 +53,34 @@ public class ItemTeleportBow extends Item {
                 f = 1.0F;
             }
 
-            EntityTeleportArrow entityarrow = new EntityTeleportArrow(par2World, par3EntityPlayer, f * 2.0F);
+            EntityTeleportArrow entityarrow = new EntityTeleportArrow(worldIn, playerIn, f * 2.0F);
 
             if (f == 1.0F)
             {
                 entityarrow.setIsCritical(true);
             }
 
-            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, par1ItemStack);
+            int k = EnchantmentHelper.getEnchantmentLevel(Enchantment.power.effectId, stack);
 
             if (k > 0)
             {
-                entityarrow.setDamage(entityarrow.getDamage() + k * 0.5D + 0.5D);
+                entityarrow.setDamage(entityarrow.getDamage() + (double)k * 0.5D + 0.5D);
             }
 
-            int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, par1ItemStack);
+            int l = EnchantmentHelper.getEnchantmentLevel(Enchantment.punch.effectId, stack);
 
             if (l > 0)
             {
                 entityarrow.setKnockbackStrength(l);
             }
 
-            if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, par1ItemStack) > 0)
+            if (EnchantmentHelper.getEnchantmentLevel(Enchantment.flame.effectId, stack) > 0)
             {
                 entityarrow.setFire(100);
             }
 
-            par1ItemStack.damageItem(1, par3EntityPlayer);
-            par2World.playSoundAtEntity(par3EntityPlayer, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
+            stack.damageItem(1, playerIn);
+            worldIn.playSoundAtEntity(playerIn, "random.bow", 1.0F, 1.0F / (itemRand.nextFloat() * 0.4F + 1.2F) + f * 0.5F);
 
             if (flag)
             {
@@ -100,27 +88,31 @@ public class ItemTeleportBow extends Item {
             }
             else
             {
-                par3EntityPlayer.inventory.consumeInventoryItem(SimpleItems.arrow_teleport.itemID);
+                playerIn.inventory.consumeInventoryItem(Items.arrow);
             }
 
-            if (!par2World.isRemote)
+            playerIn.triggerAchievement(StatList.objectUseStats[Item.getIdFromItem(this)]);
+
+            if (!worldIn.isRemote)
             {
-                par2World.spawnEntityInWorld(entityarrow);
+                worldIn.spawnEntityInWorld(entityarrow);
             }
         }
     }
 
-    @Override
-	public ItemStack onEaten(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
+    /**
+     * Called when the player finishes using this Item (E.g. finishes eating.). Not called when the player stops using
+     * the Item before the action is complete.
+     */
+    public ItemStack onItemUseFinish(ItemStack stack, World worldIn, EntityPlayer playerIn)
     {
-        return par1ItemStack;
+        return stack;
     }
 
     /**
      * How long it takes to use or consume an item
      */
-    @Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+    public int getMaxItemUseDuration(ItemStack stack)
     {
         return 72000;
     }
@@ -128,83 +120,33 @@ public class ItemTeleportBow extends Item {
     /**
      * returns the action that specifies what animation to play when the items is being used
      */
-    @Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
+    public EnumAction getItemUseAction(ItemStack stack)
     {
-        return EnumAction.bow;
+        return EnumAction.BOW;
     }
 
     /**
      * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
      */
-    @Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
+    public ItemStack onItemRightClick(ItemStack itemStackIn, World worldIn, EntityPlayer playerIn)
     {
-        ArrowNockEvent event = new ArrowNockEvent(par3EntityPlayer, par1ItemStack);
-        MinecraftForge.EVENT_BUS.post(event);
-        if (event.isCanceled())
+        net.minecraftforge.event.entity.player.ArrowNockEvent event = new net.minecraftforge.event.entity.player.ArrowNockEvent(playerIn, itemStackIn);
+        if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) return event.result;
+
+        if (playerIn.capabilities.isCreativeMode || playerIn.inventory.hasItem(Items.arrow))
         {
-            return event.result;
+            playerIn.setItemInUse(itemStackIn, this.getMaxItemUseDuration(itemStackIn));
         }
 
-        if (par3EntityPlayer.capabilities.isCreativeMode || par3EntityPlayer.inventory.hasItem(SimpleItems.arrow_teleport.itemID))
-        {
-            par3EntityPlayer.setItemInUse(par1ItemStack, this.getMaxItemUseDuration(par1ItemStack));
-        }
-
-        return par1ItemStack;
+        return itemStackIn;
     }
 
     /**
      * Return the enchantability factor of the item, most of the time is based on material.
      */
-    @Override
-	public int getItemEnchantability()
+    public int getItemEnchantability()
     {
         return 1;
     }
 
-    @Override
-	@SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister par1IconRegister)
-    {
-        this.itemIcon = par1IconRegister.registerIcon(this.getIconString() + "_standby");
-        this.iconArray = new Icon[bowPullIconNameArray.length];
-
-        for (int i = 0; i < this.iconArray.length; ++i)
-        {
-            this.iconArray[i] = par1IconRegister.registerIcon(this.getIconString() + "_" + bowPullIconNameArray[i]);
-        }
-    }
-
-    @SideOnly(Side.CLIENT)
-
-    /**
-     * used to cycle through icons based on their used duration, i.e. for the bow
-     */
-    public Icon getItemIconForUseDuration(int par1)
-    {
-        return this.iconArray[par1];
-    }
-    
-    @Override
-    public Icon getIcon(ItemStack stack, int renderPass, EntityPlayer player, ItemStack usingItem, int useRemaining)
-    {
-     if(player.getItemInUse() == null) return this.itemIcon;
-            int Pulling = stack.getMaxItemUseDuration() - useRemaining;
-            if (Pulling >= 18)
-            {
-             return iconArray[2];
-            }
-            else if (Pulling > 13)
-            {
-             return iconArray[1];
-            }
-            else if (Pulling > 0)
-            {
-             return iconArray[0];
-            }                         
-            return itemIcon;
-}
-    
 }

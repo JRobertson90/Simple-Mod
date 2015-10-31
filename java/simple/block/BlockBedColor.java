@@ -3,41 +3,41 @@ package simple.block;
 import java.util.Random;
 
 import net.minecraft.block.BlockBed;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.item.Item;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import simple.item.ItemBedColor;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockBedColor extends BlockBed {
 
 	// See the ItemBedColor class for these values.
 	int color;
 	
-	public BlockBedColor(int par1, int color) {
-		super(par1);
+	public BlockBedColor(int color) {
+		super();
 		this.color = color;
 	}
 
-	/**
-     * Returns the ID of the items to drop on destruction.
+    @Override
+    /**
+     * Get the Item that this Block should drop when harvested.
+     *
+     * @param fortune the level of the Fortune enchantment on the player's tool
      */
-	@Override
-    public int idDropped(int par1, Random par2Random, int par3)
+    public Item getItemDropped(IBlockState state, Random rand, int fortune)
     {
-        return isBlockHeadOfBed(par1) ? 0 : ItemBedColor.items[color].itemID;
+        return state.getValue(PART) == BlockBed.EnumPartType.HEAD ? null : ItemBedColor.items[color];
     }
-	
+
     /**
      * only called by clickMiddleMouseButton , and passed to inventory.setCurrentItem (along with isCreative)
      */
-    @Override
-	public int idPicked(World par1World, int par2, int par3, int par4)
+    @SideOnly(Side.CLIENT)
+    public Item getItem(World worldIn, BlockPos pos)
     {
-        return ItemBedColor.items[color].itemID;
-    }
-    
-    @Override
-    public boolean isBed(World world, int x, int y, int z, EntityLivingBase player)
-    {
-    	return true;
+        return ItemBedColor.items[color];
     }
 }
