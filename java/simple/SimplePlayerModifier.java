@@ -11,7 +11,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingJumpEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -132,6 +131,7 @@ public class SimplePlayerModifier {
 		return player.worldObj.isAirBlock(new BlockPos(player.posX, player.posY + 1, player.posZ));
 	}
 
+	@SuppressWarnings("unused")
 	@SubscribeEvent
 	public void onLivingJumpEvent(LivingJumpEvent event) {
 		if(event.entity instanceof EntityPlayer) {
@@ -140,7 +140,6 @@ public class SimplePlayerModifier {
 		}
 	}
 
-
 	public static void superJump(EntityPlayer player) {
 		player.motionY += JUMP_HEIGHT_INCREASE;
 		double horizontalMultiplier = player.isSprinting() ? JUMP_HORIZONTAL_MULTIPLIER : JUMP_HORIZONTAL_SPRINT_MULTIPLIER;
@@ -148,6 +147,7 @@ public class SimplePlayerModifier {
 		player.motionZ *= horizontalMultiplier;
 	}
 
+	@SuppressWarnings("unused")
 	@SubscribeEvent
 	public void livingFall(LivingFallEvent event) {
 	    if (event.entityLiving instanceof EntityPlayer) {
