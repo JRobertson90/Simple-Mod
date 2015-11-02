@@ -1,4 +1,4 @@
-package simple.tool;
+package simple.item.tool;
 
 import net.minecraft.item.ItemPickaxe;
 

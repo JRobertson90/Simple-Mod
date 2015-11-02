@@ -1,14 +1,17 @@
 package simple.block.moses;
 
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import simple.block.SimpleBlocks;
+import net.minecraft.block.Block;
+import net.minecraft.world.World;
+
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
-
-import simple.block.SimpleBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.util.ChunkCoordinates;
-import net.minecraft.world.World;
 
 public class MosesStaff {
 
@@ -19,9 +22,9 @@ public class MosesStaff {
 	private static final int SIDE_LENGTH = 2;
 	private static final int BACKWARD_LENGTH = 2;
 	
-	private static ChunkCoordinates staffLocation;
-	private static Map<ChunkCoordinates, Boolean> canPlaceBlock;
-	private static Queue<ChunkCoordinates> diffusionQueue;
+	private static BlockPos staffLocation;
+	private static Map<BlockPos, Boolean> canPlaceBlock;
+	private static Queue<BlockPos> diffusionQueue;
 	
 	private static int boundXPos;
 	private static int boundXNeg;
@@ -33,15 +36,15 @@ public class MosesStaff {
 	//------------------------
 	//  Initialize
 	//------------------------
-	private static void initialize(World world, int x, int y, int z, boolean placed, int direction) {
+	private static void initialize(BlockPos pos, EnumFacing facing) {
 		
-		staffLocation = new ChunkCoordinates(x,y,z);
-		canPlaceBlock = new HashMap<ChunkCoordinates, Boolean>();
-		diffusionQueue = new LinkedList<ChunkCoordinates>();
-		canPlaceBlock.put(new ChunkCoordinates(x,y,z), false);
+		staffLocation = new BlockPos(pos.getX(), pos.getY(), pos.getZ());
+		canPlaceBlock = new HashMap<BlockPos, Boolean>();
+		diffusionQueue = new LinkedList<BlockPos>();
+		canPlaceBlock.put(new BlockPos(pos.getX(), pos.getY(), pos.getZ()), false);
 		greatestHeightSoFar = 0;
-		addNeighborsToQueue(x,y,z);
-		adjustBoundaries(direction);
+		addNeighborsToQueue(pos);
+		adjustBoundaries(facing);
 	}
 
 	//------------------------
@@ -50,69 +53,81 @@ public class MosesStaff {
 	// Replaces some air blocks nearby the staff with water to ensure the water caves in all the way.
 	private static void replaceWater(World world) {
 
-		for(ChunkCoordinates cc : canPlaceBlock.keySet()) {
-			if(cc.posY == greatestHeightSoFar && world.isAirBlock(cc.posX, cc.posY, cc.posZ) &&
-					cc.posX > cc.posX - SIDE_LENGTH && cc.posX < cc.posX + SIDE_LENGTH &&
-					cc.posZ > cc.posZ - SIDE_LENGTH && cc.posZ < cc.posZ + SIDE_LENGTH) {
-				world.setBlock(cc.posX, cc.posY, cc.posZ, 8, 0, 0x0);
-				world.markBlockForUpdate(cc.posX, cc.posY, cc.posZ);
+		for(BlockPos pos : canPlaceBlock.keySet()) {
+			if(pos.getY() == greatestHeightSoFar && world.isAirBlock(pos) &&
+					pos.getX() > pos.getX() - SIDE_LENGTH && pos.getX() < pos.getX() + SIDE_LENGTH &&
+					pos.getZ() > pos.getZ() - SIDE_LENGTH && pos.getZ() < pos.getZ() + SIDE_LENGTH) {
+
+				world.setBlockState(pos, Blocks.flowing_water.getDefaultState());
+				world.markBlockForUpdate(pos);
 			}
 		}
-		world.notifyBlocksOfNeighborChange(staffLocation.posX, staffLocation.posY, staffLocation.posZ, world.getBlockMetadata(staffLocation.posX, staffLocation.posY, staffLocation.posZ));
+		world.notifyBlockOfStateChange(staffLocation, world.getBlockState(staffLocation).getBlock());
 	}
 
-	//------------------------
-	//  Adjust Boundaries
-	//------------------------
-	// Directions: 0 = south, 1 = west, 2 = north, 3 = east
-	// South = Pos Z, West = Neg X, North = Neg Z, East = Pos X
-	private static void adjustBoundaries(int direction) {
+
+	/*------------------------------------------\
+	|             Adjust Boundaries             |
+	|-------------------------------------------|
+	|                   NORTH                   |
+	|                                           |
+	|                    z-                     |
+	|                                           |
+	|    WEST      x-          x+      EAST     |
+	|                                           |
+	|                    z+                     |
+	|                                           |
+	|                  SOUTH                    |
+	|-------------------------------------------|
+	|            Coordinates Map                |
+	\------------------------------------------*/
+	private static void adjustBoundaries(EnumFacing facing) {
 		
-		switch(direction) {
-		case 0: {
-			boundZPos = FORWARD_LENGTH;
-			boundZNeg = BACKWARD_LENGTH;
-			boundXNeg = SIDE_LENGTH;
-			boundXPos = SIDE_LENGTH;
-			break;
-		}
-		case 1: {
-			boundXNeg = FORWARD_LENGTH;
-			boundXPos = BACKWARD_LENGTH;
-			boundZNeg = SIDE_LENGTH;
-			boundZPos = SIDE_LENGTH;
-			break;
-		}
-		case 2: {
-			boundZNeg = FORWARD_LENGTH;
-			boundZPos = BACKWARD_LENGTH;
-			boundXNeg = SIDE_LENGTH;
-			boundXPos = SIDE_LENGTH;
-			break;
-		}
-		case 3: {
-			boundXPos = FORWARD_LENGTH;
-			boundXNeg = BACKWARD_LENGTH;
-			boundZNeg = SIDE_LENGTH;
-			boundZPos = SIDE_LENGTH;
-			break;
-		}
+		switch(facing) {
+			case SOUTH: {
+				boundZPos = FORWARD_LENGTH;
+				boundZNeg = BACKWARD_LENGTH;
+				boundXNeg = SIDE_LENGTH;
+				boundXPos = SIDE_LENGTH;
+				break;
+			}
+			case WEST: {
+				boundXNeg = FORWARD_LENGTH;
+				boundXPos = BACKWARD_LENGTH;
+				boundZNeg = SIDE_LENGTH;
+				boundZPos = SIDE_LENGTH;
+				break;
+			}
+			case NORTH: {
+				boundZNeg = FORWARD_LENGTH;
+				boundZPos = BACKWARD_LENGTH;
+				boundXNeg = SIDE_LENGTH;
+				boundXPos = SIDE_LENGTH;
+				break;
+			}
+			case EAST: {
+				boundXPos = FORWARD_LENGTH;
+				boundXNeg = BACKWARD_LENGTH;
+				boundZNeg = SIDE_LENGTH;
+				boundZPos = SIDE_LENGTH;
+				break;
+			}
 		}
 	}
 
 	//------------------------
 	//  Diffuse Air
 	//------------------------
-	public static void diffuseAir(World world, int x, int y, int z, boolean placed, int direction) {
+	public static void diffuseAir(World world, BlockPos pos, boolean placed, EnumFacing facing) {
 
 		if(!world.isRemote) {
 			
-			initialize(world,x,y,z,placed,direction);
+			initialize(pos, facing);
 			
 			while(diffusionQueue.size() > 0) {
 				
-				ChunkCoordinates c = diffusionQueue.remove();
-				diffuseAirRec(world, c.posX, c.posY, c.posZ, placed, direction);
+				BlockPos next = diffusionQueue.remove();
+				diffuseAirRec(world, next, placed);
 			}
 			
 			if(!placed) {
@@ -124,92 +139,85 @@ public class MosesStaff {
 	//--------------------------
 	//  Diffuse Air Recursive
 	//--------------------------
-	private static void diffuseAirRec(World world, int x, int y, int z, boolean placed, int direction) {
+	private static void diffuseAirRec(World world, BlockPos pos, boolean placed) {
 
-		if( ! insideBoundaries(world,x,y,z) || alreadyVisited(x,y,z)) {
+		if( ! insideBoundaries(world, pos) || alreadyVisited(pos)) {
 			return;
 		}
 
-		Block block = Block.blocksList[world.getBlockId(x, y, z)];
+		Block block = world.getBlockState(pos).getBlock();
 		
-		if (block != null && canPlaceBlock(world,x,y,z)) {
-			canPlaceBlock.put(new ChunkCoordinates(x,y,z), true);
-			if(y > greatestHeightSoFar) {
-				greatestHeightSoFar = y;
+		if (block != null && canPlaceBlock(world, pos)) {
+			canPlaceBlock.put(pos, true);
+			if(pos.getY() > greatestHeightSoFar) {
+				greatestHeightSoFar = pos.getY();
 			}
 		}
 		else {
-			canPlaceBlock.put(new ChunkCoordinates(x,y,z), false);
+			canPlaceBlock.put(pos, false);
 			return;
 		}
 		
-		placeInvisMosesBlock(world, x, y, z, placed);
-		addNeighborsToQueue(x,y,z);
+		placeInvisMosesBlock(world, pos, placed);
+		addNeighborsToQueue(pos);
 	}
 
 	//------------------------
 	//  Already Visited
 	//------------------------
-	private static boolean alreadyVisited(int x, int y, int z) {
+	private static boolean alreadyVisited(BlockPos pos) {
 		
-		return canPlaceBlock.get(new ChunkCoordinates(x,y,z)) != null;
+		return canPlaceBlock.get(pos) != null;
 	}
 
 	//------------------------
 	//  Inside Boundaries
 	//------------------------
-	private static boolean insideBoundaries(World world,int x, int y, int z) {
+	private static boolean insideBoundaries(World world, BlockPos pos) {
 
-		if(x < staffLocation.posX - boundXNeg ||
-			x > staffLocation.posX + boundXPos ||
-			z < staffLocation.posZ - boundZNeg ||
-			z > staffLocation.posZ + boundZPos ||
-			y < 0 ||
-			y >= world.getHeight() ) {
-			return false;
-		}
-		return true;
+		return !(pos.getX() < staffLocation.getX() - boundXNeg ||
+				pos.getX() > staffLocation.getX() + boundXPos ||
+				pos.getZ() < staffLocation.getZ() - boundZNeg ||
+				pos.getZ() > staffLocation.getZ() + boundZPos ||
+				pos.getY() < 0 ||
+				pos.getY() >= world.getHeight());
 	}
 
 	//------------------------
 	//  Can Place Block
 	//------------------------
-	private static boolean canPlaceBlock(World world, int x, int y, int z) {
+	private static boolean canPlaceBlock(World world, BlockPos pos) {
 		
-		int id = world.getBlockId(x, y, z);
-		if(id == Block.waterMoving.blockID || id == Block.waterStill.blockID || id == SimpleBlocks.moses_air_block.blockID) {
-			return true;
-		}
-		return false;
+		Block block = world.getBlockState(pos).getBlock();
+		return block == Blocks.flowing_water || block == Blocks.water || block == SimpleBlocks.moses_air_block;
 	}
 
 	//----------------------------
 	//  Add Neighbors to Queue
 	//----------------------------
-	private static void addNeighborsToQueue(int x, int y, int z) {
+	private static void addNeighborsToQueue(BlockPos pos) {
 		
-		diffusionQueue.add(new ChunkCoordinates(x,y,z+1));
-		diffusionQueue.add(new ChunkCoordinates(x,y,z-1));
-		diffusionQueue.add(new ChunkCoordinates(x,y+1,z));
-		diffusionQueue.add(new ChunkCoordinates(x,y-1,z));
-		diffusionQueue.add(new ChunkCoordinates(x+1,y,z));
-		diffusionQueue.add(new ChunkCoordinates(x-1,y,z));
+		diffusionQueue.add(pos.west());
+		diffusionQueue.add(pos.east());
+		diffusionQueue.add(pos.up());
+		diffusionQueue.add(pos.down());
+		diffusionQueue.add(pos.north());
+		diffusionQueue.add(pos.south());
 	}
 
 	//------------------------
 	//  Place Moses Block
 	//------------------------
-	private static void placeInvisMosesBlock(World world, int x, int y, int z, boolean blockPlaced) {
-		
+	private static void placeInvisMosesBlock(World world, BlockPos pos, boolean blockPlaced) {
+
 		if (blockPlaced) {
-			int blockID = SimpleBlocks.moses_air_block.blockID;
-			world.setBlock(x, y, z, blockID, 0, 0x0);
-			world.markBlockForUpdate(x, y, z);
+			world.setBlockState(pos, SimpleBlocks.moses_air_block.getDefaultState());
+			world.markBlockForUpdate(pos);
 		}
 		else {
-			world.setBlock(x, y, z, 0, 0, 0x0);
-			world.markBlockForUpdate(x, y, z);
-			world.notifyBlocksOfNeighborChange(x, y, z, 0);
+			world.setBlockState(pos, Blocks.air.getDefaultState());
+			world.markBlockForUpdate(pos);
+			world.notifyBlockOfStateChange(pos, Blocks.air);
 		}
 	}
 	

@@ -1,4 +1,4 @@
-package simple.christmasChest;
+package simple.block.chest.christmas;
 
 import net.minecraft.tileentity.TileEntityChest;
 

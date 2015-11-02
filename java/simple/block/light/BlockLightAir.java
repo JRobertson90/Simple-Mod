@@ -3,24 +3,24 @@
 //   Greg's Lighting - Floodlight Beam Block
 //
 //------------------------------------------------------
-
-package simple.lighting;
+package simple.block.light;
 
 import java.util.Random;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
 
 public class BlockLightAir extends Block {
 
-	public BlockLightAir(int id) {
-		super(id, Material.vine);
-		setLightValue(1.0F);
+	public BlockLightAir() {
+		super(Material.vine);
+		setLightLevel(1.0F);
 		setLightOpacity(0);
 		setHardness(-1);
 		setResistance(6000000);
-		if (Floodlight.debugBeamBlocks)
+		if (Floodlight.DEBUG_MODE)
 			setBlockBounds(3/8.0F, 3/8.0F, 3/8.0F, 5/8.0F, 5/8.0F, 5/8.0F);
 		else
 			setBlockBounds(0F, 0F, 0F, 0F, 0F, 0F);
@@ -32,24 +32,24 @@ public class BlockLightAir extends Block {
 	}
     
 	@Override
-	public boolean isAirBlock(World world, int x, int y, int z)  {
+	public boolean isAir(IBlockAccess world, BlockPos pos)  {
 		return true;
 	}
 	
 	@Override
-	public boolean canBeReplacedByLeaves(World world, int x, int y, int z) {
+	public boolean canBeReplacedByLeaves(IBlockAccess world, BlockPos pos) {
 		return true;
 	}
 	
 	@Override
-	public boolean isLeaves(World world, int x, int y, int z) {
+	public boolean isLeaves(IBlockAccess world, BlockPos pos) {
 		// This is a bit screwy, but it's needed so that trees are not prevented from growing
 		// near a floodlight beam.
 		return true;
 	}
 
 	@Override
-	public boolean renderAsNormalBlock() {
+	public boolean isNormalCube() {
 		return false;
 	}
 	
@@ -59,7 +59,7 @@ public class BlockLightAir extends Block {
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4) {
+	public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
 		return null;
 	}
 
@@ -69,13 +69,7 @@ public class BlockLightAir extends Block {
 	}
 
 	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int neighborBlockID) {
-//		Floodlight.diffuseLight(world, x, y, z);
+	public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
 	}
 	
-	@Override
-	public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-		return null;
-	}
-
 }

@@ -5,44 +5,76 @@ import java.util.Random;
 
 import net.minecraft.block.BlockFence;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IconRegister;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import simple.item.SimpleItems;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockMosesStaff extends BlockFence {
-	
-	// Metadata 0-3 direction, 4 on means top part of staff
-	
-	public BlockMosesStaff(int par1)
-	{
-		super(par1, "acm:moses_staff", Material.wood);
+
+	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+	public static final PropertyBool TOP_STAFF = PropertyBool.create("topstaff");
+
+	public BlockMosesStaff() {
+		super(Material.wood);
 		setCreativeTab(null);
+		this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH).withProperty(TOP_STAFF, Boolean.valueOf(false)));
+	}
+
+	@Override
+	protected BlockState createBlockState() {
+		return new BlockState(this, FACING, TOP_STAFF);
+	}
+
+	// Metadata 0-3 = direction, 4 = top part of staff
+	@Override
+	public int getMetaFromState(IBlockState state) {
+		EnumFacing direction = (EnumFacing) state.getValue(FACING);
+		boolean isTopStaff = (Boolean) state.getValue(TOP_STAFF);
+		return direction.getIndex() | (isTopStaff ? 4 : 0);
+	}
+
+	@Override
+	public IBlockState getStateFromMeta(int meta) {
+		return this.getDefaultState()
+				.withProperty(FACING, EnumFacing.getHorizontal(meta & 3))
+				.withProperty(TOP_STAFF, Boolean.valueOf((meta & 4) == 4));
 	}
 
 	/**
      * Called right before the block is destroyed by a player.  Args: world, x, y, z, metaData
      */
 	@Override
-    public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int meta) {
-    	
-		// If this block is top part of staff
-    	if((meta & 4) == 4) { 
+	public void onBlockDestroyedByPlayer(World worldIn, BlockPos pos, IBlockState state) {
 
-    		world.setBlockToAir(x, y-1, z);
-    		if(!world.isRemote) {
-    			MosesStaff.diffuseAir(world, x, y-1, z, false, meta & 3);
+		EnumFacing facing = (EnumFacing) state.getValue(FACING);
+		boolean isTopStaff = (Boolean) state.getValue(TOP_STAFF);
+
+		// If this block is top part of staff
+    	if(isTopStaff) {
+
+    		worldIn.setBlockToAir(pos.down());
+    		if( ! worldIn.isRemote) {
+    			MosesStaff.diffuseAir(worldIn, pos.down(), false, facing);
     		}
     	}
     	else {
-    		world.setBlockToAir(x, y+1, z);
-    		if(!world.isRemote) {
-    			MosesStaff.diffuseAir(world, x, y, z, false, meta & 3);
+    		worldIn.setBlockToAir(pos.up());
+    		if( ! worldIn.isRemote) {
+    			MosesStaff.diffuseAir(worldIn, pos, false, facing);
     		}
     	}
     }
@@ -51,8 +83,8 @@ public class BlockMosesStaff extends BlockFence {
 	 * Adds all intersecting collision boxes to a list. (Be sure to only add boxes to the list if they intersect the
 	 * mask.) Parameters: World, X, Y, Z, mask, list, colliding entity
 	 */
-	public void addCollisionBoxesToList(World par1World, int par2, int par3, int par4, AxisAlignedBB par5AxisAlignedBB, List par6List, Entity par7Entity)
-	{
+	@Override
+	public void addCollisionBoxesToList(World worldIn, BlockPos pos, IBlockState state, AxisAlignedBB mask, List list, Entity collidingEntity) {
 		float f = 0.375F;
 		float f1 = 0.625F;
 		float f2 = 0.375F;
@@ -64,8 +96,8 @@ public class BlockMosesStaff extends BlockFence {
 	/**
 	 * Updates the blocks bounds based on its current state. Args: world, x, y, z
 	 */
-	public void setBlockBoundsBasedOnState(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
-	{
+	@Override
+	public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos) {
 		float f = 0.375F;
 		float f1 = 0.625F;
 		float f2 = 0.375F;
@@ -74,71 +106,58 @@ public class BlockMosesStaff extends BlockFence {
 		this.setBlockBounds(f, 0.0F, f2, f1, 1.0F, f3);
 	}
 
-	/**
-	 * Is this block (a) opaque and (b) a full 1m cube?  This determines whether or not to render the shared face of two
-	 * adjacent blocks and also whether the player can attach torches, redstone wire, etc to this block.
-	 */
-	public boolean isOpaqueCube()
-	{
+	@Override
+	public boolean isOpaqueCube() {
 		return false;
 	}
 
-	/**
-	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-	 */
-	public boolean renderAsNormalBlock()
-	{
+	@Override
+	public boolean isSolidFullCube() {
 		return false;
 	}
 
-	public boolean getBlocksMovement(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
-	{
+	@Override
+	public boolean isNormalCube() {
 		return false;
 	}
 
-	@SideOnly(Side.CLIENT)
-	/**
-	 * Returns true if the given side of this block type should be rendered, if the adjacent block is at the given
-	 * coordinates.  Args: blockAccess, x, y, z, side
-	 */
-	public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5)
-	{
+	@Override
+	public boolean isVisuallyOpaque() {
+		return false;
+	}
+
+	@Override
+	public boolean isFullCube() {
+		return false;
+	}
+
+	@Override
+	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
 		return true;
 	}
 
+	@Override
 	@SideOnly(Side.CLIENT)
-
-	/**
-	 * When this method is called, your block should register all the icons it needs with the given IconRegister. This
-	 * is the only chance you get to register icons.
-	 */
-	public void registerIcons(IconRegister par1IconRegister)
-	{
-		this.blockIcon = par1IconRegister.registerIcon("acm:moses_staff");
+	public boolean shouldSideBeRendered(IBlockAccess worldIn, BlockPos pos, EnumFacing side) {
+		return true;
 	}
 
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
+	@Override
+	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
 		return false;
 	}
-	
-	/**
-     * only called by clickMiddleMouseButton , and passed to inventory.setCurrentItem (along with isCreative)
-     */
-    public int idPicked(World par1World, int par2, int par3, int par4)
-    {
-        return SimpleItems.moses_staff.itemID;
+
+	@Override
+	public ItemStack getPickBlock(MovingObjectPosition target, World world, BlockPos pos) {
+        return new ItemStack(SimpleItems.moses_staff, 1);
     }
-    
+
     /**
      * Returns the ID of the items to drop on destruction.
      */
-    public int idDropped(int par1, Random par2Random, int par3)
-    {
-        return SimpleItems.moses_staff.itemID;
+	@Override
+	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return SimpleItems.moses_staff;
     }
 
 

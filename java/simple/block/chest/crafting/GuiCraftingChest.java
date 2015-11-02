@@ -1,4 +1,4 @@
-package simple.craftingChest;
+package simple.block.chest.crafting;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -11,19 +11,17 @@ import org.lwjgl.opengl.GL11;
 public class GuiCraftingChest extends GuiContainer {
 
 	private static final ResourceLocation craftingChestResourceLocation = new ResourceLocation("acm:textures/gui/container/crafting_chest.png");
-	private int color = 0;
-	private int changecolor = 0;
-	
-	public GuiCraftingChest (InventoryPlayer inventoryPlayer, TileEntityCraftingChest tileEntity, World world, int x, int y, int z) {
-		super(new ContainerCraftingChest(inventoryPlayer, tileEntity, world, x, y, z));
+
+	public GuiCraftingChest (InventoryPlayer inventoryPlayer, TileEntityCraftingChest tileEntity, World world) {
+		super(new ContainerCraftingChest(inventoryPlayer, tileEntity, world));
 		this.ySize = 236;
 	}
 	
 	@Override
 	protected void drawGuiContainerForegroundLayer(int param1, int param2) {
 		// the parameters for drawString are: text, x, y, color
-		fontRenderer.drawString("Crafting Chest", 8, 8, 0);
-		fontRenderer.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 93 + 2, 0);
+		this.fontRendererObj.drawString("Crafting Chest", 8, 8, 0);
+		this.fontRendererObj.drawString(StatCollector.translateToLocal("container.inventory"), 8, ySize - 93 + 2, 0);
 	}
 
 	@Override

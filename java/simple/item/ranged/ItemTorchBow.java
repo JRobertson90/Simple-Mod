@@ -1,6 +1,6 @@
-package simple.ranged;
+package simple.item.ranged;
 
-import simple.entity.EntityTeleportArrow;
+import simple.entity.EntityTorchArrow;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -12,12 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.stats.StatList;
 import net.minecraft.world.World;
 
-public class ItemTeleportBow extends Item
+public class ItemTorchBow extends Item
 {
     public static final String[] bowPullIconNameArray = new String[] {"pulling_0", "pulling_1", "pulling_2"};
     private static final String __OBFID = "CL_00001777";
 
-    public ItemTeleportBow()
+    public ItemTorchBow()
     {
         this.maxStackSize = 1;
         this.setMaxDamage(384);
@@ -53,7 +53,7 @@ public class ItemTeleportBow extends Item
                 f = 1.0F;
             }
 
-            EntityTeleportArrow entityarrow = new EntityTeleportArrow(worldIn, playerIn, f * 2.0F);
+            EntityTorchArrow entityarrow = new EntityTorchArrow(worldIn, playerIn, f * 2.0F);
 
             if (f == 1.0F)
             {

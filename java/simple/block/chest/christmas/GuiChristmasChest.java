@@ -1,7 +1,7 @@
-package simple.christmasChest;
+package simple.block.chest.christmas;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
@@ -12,23 +12,18 @@ public class GuiChristmasChest extends GuiContainer {
 
 	private static final ResourceLocation christmasChestResourceLocation = new ResourceLocation("acm:textures/gui/container/christmas_chest.png");
 
-    private IInventory upperChestInventory;
-    private IInventory lowerChestInventory;
-
     /**
      * window height is calculated with this values, the more rows, the heigher
      */
     private int inventoryRows;
 
-    public GuiChristmasChest(IInventory par1IInventory, IInventory par2IInventory)
+    public GuiChristmasChest(IInventory playerInventory, IInventory chestInventory, EntityPlayer player)
     {
-        super(new ContainerChest(par1IInventory, par2IInventory));
-        this.upperChestInventory = par1IInventory;
-        this.lowerChestInventory = par2IInventory;
+        super(new ContainerChest(playerInventory, chestInventory, player));
         this.allowUserInput = false;
         short short1 = 222;
         int i = short1 - 108;
-        this.inventoryRows = par2IInventory.getSizeInventory() / 9;
+        this.inventoryRows = chestInventory.getSizeInventory() / 9;
         this.ySize = i + this.inventoryRows * 18;
     }
 

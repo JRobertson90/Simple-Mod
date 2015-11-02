@@ -1,51 +1,36 @@
-package simple.craftingChest;
+package simple.block.chest.crafting;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
 import net.minecraft.client.model.ModelChest;
-import net.minecraft.client.model.ModelLargeChest;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ResourceLocation;
 
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
-
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityCraftingChestRenderer extends TileEntitySpecialRenderer {
 
 	private static final ResourceLocation RES_CRAFTING_CHEST = new ResourceLocation("acm:textures/entity/chest/crafting.png");
 
-	private static int rotator = 0;
-
 	/** The normal small chest model. */
 	private ModelChest chestModel = new ModelChest();
-
-	/** The large double chest model. */
-	private ModelChest largeChestModel = new ModelLargeChest();
-
-	public TileEntityCraftingChestRenderer()
-	{
-
-	}
 
 	/**
 	 * Renders the TileEntity for the chest at a position.
 	 */
-	public void renderTileEntityChestAt(TileEntityChest par1TileEntityChest, double par2, double par4, double par6, float par8)
+	private void renderTileEntityChestAt(TileEntityChest te, double posX, double posY, double posZ, float p_180538_8_, int p_180538_9_)
 	{
 		int facing;
 
-		if (!par1TileEntityChest.hasWorldObj()) {
+		if (!te.hasWorldObj()) {
 			facing = 0;
 		}
 		else {
-			facing = par1TileEntityChest.getBlockMetadata();
+			facing = te.getBlockMetadata();
 		}
 
 		ModelChest modelchest;
@@ -56,7 +41,7 @@ public class TileEntityCraftingChestRenderer extends TileEntitySpecialRenderer {
 		GL11.glPushMatrix();
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-		GL11.glTranslatef((float)par2 - 0.06F, (float)par4 + 1.06F, (float)par6 + 1.06F);
+		GL11.glTranslatef((float)posX - 0.06F, (float)posY + 1.06F, (float)posZ + 1.06F);
 		GL11.glScalef(1.12F, -1.06F, -1.12F);
 		GL11.glTranslatef(0.5F, 0.5F, 0.5F);
 
@@ -71,7 +56,7 @@ public class TileEntityCraftingChestRenderer extends TileEntitySpecialRenderer {
 
 		GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
-		float f1 = par1TileEntityChest.prevLidAngle + (par1TileEntityChest.lidAngle - par1TileEntityChest.prevLidAngle) * par8;
+		float f1 = te.prevLidAngle + (te.lidAngle - te.prevLidAngle) * p_180538_8_;
 		float f2;
 
 		f1 = 1.0F - f1;
@@ -82,11 +67,10 @@ public class TileEntityCraftingChestRenderer extends TileEntitySpecialRenderer {
 		GL11.glPopMatrix();
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 	}
-
+	
 	@Override
-	public void renderTileEntityAt(TileEntity par1TileEntity, double par2, double par4, double par6, float par8)
-	{
-		this.renderTileEntityChestAt((TileEntityChest)par1TileEntity, par2, par4, par6, par8);
+	public void renderTileEntityAt(TileEntity tileEntity, double posX, double posY, double posZ, float p_180535_8_, int p_180535_9_) {
+		this.renderTileEntityChestAt((TileEntityChest)tileEntity, posX, posY, posZ, p_180535_8_, p_180535_9_);
 	}
 
 }

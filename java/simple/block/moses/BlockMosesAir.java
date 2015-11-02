@@ -4,25 +4,26 @@ import java.util.Random;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
 
 public class BlockMosesAir extends Block {
 
-	private Icon icon;
+	private static final boolean DEBUG_MODE = false;
 	
-	private static final boolean debugMosesBlocks = false;
-	
-	public BlockMosesAir(int id) {
-		super(id, Material.vine);
-		setLightValue(1.0F);
+	public BlockMosesAir() {
+		super(Material.vine);
+		setLightLevel(1.0F);
 		setLightOpacity(0);
 		setHardness(-1);
 		setResistance(6000000);
-		if (debugMosesBlocks)
+		if (DEBUG_MODE) {
 			setBlockBounds(3/8.0F, 3/8.0F, 3/8.0F, 5/8.0F, 5/8.0F, 5/8.0F);
-		else
+		}
+		else {
 			setBlockBounds(0F, 0F, 0F, 0F, 0F, 0F);
+		}
 	}
 	
 	@Override
@@ -31,47 +32,24 @@ public class BlockMosesAir extends Block {
 	}
     
 	@Override
-	public boolean isAirBlock(World world, int x, int y, int z)  {
+	public boolean isAir(IBlockAccess world, BlockPos pos) {
 		return false;
 	}
 	
 	@Override
-	public boolean canBeReplacedByLeaves(World world, int x, int y, int z) {
+	public boolean canBeReplacedByLeaves(IBlockAccess world, BlockPos pos) {
 		return true;
 	}
 	
-	@Override
-	public boolean renderAsNormalBlock() {
-		return debugMosesBlocks;
-	}
-	
+
 	@Override
 	public int getRenderType() {
-		if (debugMosesBlocks)
-			return super.getRenderType();
-		else
-			return -1;
+		return DEBUG_MODE ? super.getRenderType() : -1;
 	}
 
-	
 	@Override
-	public boolean isLeaves(World world, int x, int y, int z) {
+	public boolean isLeaves(IBlockAccess world, BlockPos pos) {
 		return true;
-	}
-
-	@Override
-	public void registerIcons(IconRegister reg) {
-		if(debugMosesBlocks) {
-			icon = reg.registerIcon("acm:moses_staff");
-		}
-	}
-	
-	@Override
-	public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int side) {
-		if (debugMosesBlocks)
-			return icon;
-		else
-			return null;
 	}
 
 	@Override
@@ -80,13 +58,8 @@ public class BlockMosesAir extends Block {
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4) {
+	public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
 		return null;
 	}
 
-	@Override
-	public void onNeighborBlockChange(World world, int x, int y, int z, int neighborBlockID) {
-		
-	}
-	
 }

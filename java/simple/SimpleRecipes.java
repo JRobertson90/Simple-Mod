@@ -29,11 +29,6 @@ public class SimpleRecipes {
 		addStairsRecipe(Blocks.glass, SimpleBlocks.glass_stairs);
 		addStairsRecipe(Blocks.dirt, SimpleBlocks.dirt_stairs);
 		
-		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.oak_stairs, 8), "  #", " ##", "###", '#', new ItemStack(Blocks.planks, 1, 0));
-		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.spruce_stairs, 8), "  #"," ##","###",'#', new ItemStack(Blocks.planks,1,1));
-		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.birch_stairs, 8), "  #"," ##","###",'#', new ItemStack(Blocks.planks,1,2));
-		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.jungle_stairs, 8), "  #"," ##","###",'#', new ItemStack(Blocks.planks,1,3));
-		
 		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.leaves_oak_stairs, 4), "  #"," ##","###",'#', new ItemStack(Blocks.leaves,1,0));
 		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.leaves_spruce_stairs, 4), "  #"," ##","###",'#', new ItemStack(Blocks.leaves,1,1));
 		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.leaves_birch_stairs, 4), "  #"," ##","###",'#', new ItemStack(Blocks.leaves,1,2));

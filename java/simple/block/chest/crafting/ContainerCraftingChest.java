@@ -1,4 +1,4 @@
-package simple.craftingChest;
+package simple.block.chest.crafting;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -7,12 +7,14 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
 
 public class ContainerCraftingChest extends Container {
 
+	public final static int CRAFTING_SLOT_OFFSET = 48;
 	private final static int SLOT_HEIGHT = 18;
 	private final static int SLOT_WIDTH = 18;
 	private int slotID = 0;
@@ -21,68 +23,50 @@ public class ContainerCraftingChest extends Container {
 	public IInventory craftResult = new InventoryCraftResult();
 
 	private World worldObj;
-	private int posX;
-	private int posY;
-	private int posZ;
-	
+
 	public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3) {
-		public ItemStack getStackInSlotOnClosing(int par1){ return null; }
+		@Override public ItemStack getStackInSlotOnClosing(int par1){ return null; }
+		@Override public ItemStack decrStackSize(int index, int count) { return super.decrStackSize(index + CRAFTING_SLOT_OFFSET, count); }
+		@Override public ItemStack getStackInSlot(int index) { return super.getStackInSlot(index + CRAFTING_SLOT_OFFSET); }
+		@Override public void setInventorySlotContents(int index, ItemStack stack) { super.setInventorySlotContents(index + CRAFTING_SLOT_OFFSET, stack); }
 	};
 	
-	private boolean loading = false;
-	
-	public void update() {
-		for(int i = 0; i < 9; i++) {
-			craftMatrix.setInventorySlotContents(i, tileEntity.getStackInSlot(i+48));
-		}
-		this.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
-	}
-	
-	/**
-	 * Callback for when the crafting matrix is changed.
-	 */
-    @Override
-    public void onCraftMatrixChanged(IInventory par1IInventory)
-    {
-    	
-    }
-	
-	public ContainerCraftingChest (InventoryPlayer inventoryPlayer, TileEntityCraftingChest te, World world, int worldX, int worldY, int worldZ){
+	public ContainerCraftingChest (InventoryPlayer inventoryPlayer, TileEntityCraftingChest te, World world) {
 
 		this.tileEntity = te;
 		te.subscribe(this);
 		this.worldObj = world;
-		this.posX = worldX;
-		this.posY = worldY;
-		this.posZ = worldZ;
 
-		addChestSlots(inventoryPlayer);
+		addChestSlots();
 		addCraftingSlots(inventoryPlayer);
 		addPlayerInventory(inventoryPlayer);
 		update();
 	}
 
-	private void addChestSlots(InventoryPlayer inventoryPlayer) {
+	public void update() {
+		for(int i = 0; i < 9; i++) {
+			craftMatrix.setInventorySlotContents(i, tileEntity.getStackInSlot(i + 48));
+		}
+		this.craftResult.setInventorySlotContents(0, CraftingManager.getInstance().findMatchingRecipe(this.craftMatrix, this.worldObj));
+	}
+
+	private void addChestSlots() {
 
 		for (int row = 0; row < 7; row++) {
 			for (int column = 0; column < 9; column++) {
-				
+
 				int x = 8 + (SLOT_WIDTH * column);
 				int y = 17 + (SLOT_HEIGHT * row);
-				
-				if(row >= 2 && row <= 4 && column >= 2 && column <= 6) {
-						continue;
-				}
-				else {
+
+				if (row < 2 || row > 4 || column < 2 || column > 6) {
 					addSlotToContainer(new Slot(tileEntity, slotID++, x, y));
 				}
 			}
 		}
-	
 	}
 
 	private void addCraftingSlots(InventoryPlayer inventoryPlayer) {
-		
+
 		for(int row = 0; row < 3; row++) {
 			for(int col = 0; col < 3; col++) {
 
@@ -91,22 +75,13 @@ public class ContainerCraftingChest extends Container {
 				addSlotToContainer(new Slot(tileEntity, slotID++, x, y));
 			}
 		}
-		
+
 		// Crafting result slot
-		addSlotToContainer(new SlotCraftingChest(inventoryPlayer.player, tileEntity, this.craftResult, 0, 106, 71));
+		addSlotToContainer(new SlotCrafting(inventoryPlayer.player, craftMatrix, this.craftResult, 0, 106, 71));
 	}
 
-	public boolean func_94530_a(ItemStack par1ItemStack, Slot par2Slot)
-    {
-        return par2Slot.inventory != this.craftResult && super.func_94530_a(par1ItemStack, par2Slot);
-    }
-	
-	@Override
-	public boolean canInteractWith(EntityPlayer player) {
-		return tileEntity.isUseableByPlayer(player);
-	}
+	private void addPlayerInventory(InventoryPlayer inventoryPlayer) {
 
-	protected void addPlayerInventory(InventoryPlayer inventoryPlayer) {
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 9; j++) {
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9,
@@ -195,6 +170,24 @@ public class ContainerCraftingChest extends Container {
 	public void onContainerClosed(EntityPlayer par1EntityPlayer) {
 		super.onContainerClosed(par1EntityPlayer);
 		tileEntity.unsubscribe(this);
+	}
+
+	/**
+	 * Called to determine if the current slot is valid for the stack merging (double-click) code. The stack passed in
+	 * is null for the initial slot that was double-clicked.
+	 */
+	@Override
+	public boolean canMergeSlot(ItemStack stack, Slot slot) {
+		return slot.inventory != this.craftResult && super.canMergeSlot(stack, slot);
+	}
+
+	@Override
+	public boolean canInteractWith(EntityPlayer player) {
+		return tileEntity.isUseableByPlayer(player);
+	}
+
+	@Override
+	public void onCraftMatrixChanged(IInventory par1IInventory) {
 	}
 	
 }

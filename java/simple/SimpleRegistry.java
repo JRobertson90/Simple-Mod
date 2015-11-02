@@ -2,8 +2,8 @@ package simple;
 
 import simple.block.SimpleBlocks;
 import simple.block.BlockStairsWool;
-import simple.christmasChest.TileEntityChristmasChest;
-import simple.craftingChest.TileEntityCraftingChest;
+import simple.block.chest.christmas.TileEntityChristmasChest;
+import simple.block.chest.crafting.TileEntityCraftingChest;
 import simple.entity.EntityTeleportArrow;
 import simple.entity.EntityTorchArrow;
 import simple.item.SimpleItems;
@@ -25,10 +25,6 @@ public class SimpleRegistry {
 		
 		GameRegistry.registerBlock(SimpleBlocks.glass_stairs, "glass_stairs");
 		GameRegistry.registerBlock(SimpleBlocks.dirt_stairs, "dirt_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.oak_stairs, "wood_oak_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.spruce_stairs, "wood_spruce_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.birch_stairs, "wood_birch_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.jungle_stairs, "wood_jungle_stairs");
 		GameRegistry.registerBlock(SimpleBlocks.leaves_oak_stairs, "leaves_oak_stairs");
 		GameRegistry.registerBlock(SimpleBlocks.leaves_spruce_stairs, "leaves_spruce_stairs");
 		GameRegistry.registerBlock(SimpleBlocks.leaves_birch_stairs, "leaves_birch_stairs");

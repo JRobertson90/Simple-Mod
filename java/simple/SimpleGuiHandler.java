@@ -1,11 +1,10 @@
 package simple;
 
-import simple.christmasChest.GuiChristmasChest;
-import simple.christmasChest.TileEntityChristmasChest;
-import simple.craftingChest.ContainerCraftingChest;
-import simple.craftingChest.GuiCraftingChest;
-import simple.craftingChest.TileEntityCraftingChest;
-import net.minecraft.block.BlockChest;
+import simple.block.chest.christmas.GuiChristmasChest;
+import simple.block.chest.christmas.TileEntityChristmasChest;
+import simple.block.chest.crafting.ContainerCraftingChest;
+import simple.block.chest.crafting.GuiCraftingChest;
+import simple.block.chest.crafting.TileEntityCraftingChest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.ContainerChest;
 import net.minecraft.tileentity.TileEntity;
@@ -17,14 +16,13 @@ public class SimpleGuiHandler implements IGuiHandler {
 
 	@Override
 	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-		
-		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+		BlockPos pos = new BlockPos(x, y, z);
+		TileEntity tileEntity = world.getTileEntity(pos);
 		if(tileEntity instanceof TileEntityCraftingChest){
-            return new ContainerCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world, x, y, z);
+            return new ContainerCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
 		}
 		else if(tileEntity instanceof TileEntityChristmasChest) {
-        	BlockChest chest = (BlockChest) world.getBlockState(new BlockPos(x, y, z)).getBlock();
-            return new ContainerChest(player.inventory, chest.getInventory(world, x, y, z));
+            return new ContainerChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
         }
 		return null;
 	}
@@ -35,11 +33,10 @@ public class SimpleGuiHandler implements IGuiHandler {
 		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
 
 		if(tileEntity instanceof TileEntityCraftingChest){
-            return new GuiCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world, x, y, z);
+            return new GuiCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
 		}
 		else if(tileEntity instanceof TileEntityChristmasChest) {
-			BlockChest chest = (BlockChest) world.getBlockState(new BlockPos(x, y, z)).getBlock();
-        	return new GuiChristmasChest(player.inventory, chest.getInventory(world, x, y, z));
+        	return new GuiChristmasChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
         }
         return null;
 	}
