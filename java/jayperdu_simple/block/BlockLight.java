@@ -33,7 +33,6 @@ public class BlockLight extends Block {
 		setUnlocalizedName("light_block");
 		setCreativeTab(CreativeTabs.tabBlock);
 		GameRegistry.registerBlock(SimpleBlocks.light_block, "light_block");
-		GameRegistry.registerBlock(SimpleBlocks.light_block_air, "light_block_air");
 		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.light_block, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
 	}
 	
