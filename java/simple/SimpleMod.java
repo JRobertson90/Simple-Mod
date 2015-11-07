@@ -21,7 +21,7 @@ public class SimpleMod {
 	public static SimpleMod instance;
 
 	@EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
+	public void preInit(FMLPreInitializationEvent event) {
 		SimplePlayerModifier.setup();
 	}
 
@@ -33,8 +33,8 @@ public class SimpleMod {
 
 		proxy.registerRenderers();
 	}
-	
+
 	@EventHandler
-    public void postInit(FMLPostInitializationEvent event) {}
-	
+	public void postInit(FMLPostInitializationEvent event) {}
+
 }

@@ -3,7 +3,7 @@ package simple.block.moses;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.block.BlockFence;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
@@ -23,7 +23,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import simple.item.SimpleItems;
 
-public class BlockMosesStaff extends BlockFence {
+public class BlockMosesStaff extends Block {
 
 	public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
 	public static final PropertyBool TOP_STAFF = PropertyBool.create("topstaff");
@@ -133,7 +133,7 @@ public class BlockMosesStaff extends BlockFence {
 
 	@Override
 	public boolean isPassable(IBlockAccess worldIn, BlockPos pos) {
-		return true;
+		return false;
 	}
 
 	@Override
@@ -152,13 +152,9 @@ public class BlockMosesStaff extends BlockFence {
         return new ItemStack(SimpleItems.moses_staff, 1);
     }
 
-    /**
-     * Returns the ID of the items to drop on destruction.
-     */
 	@Override
 	public Item getItemDropped(IBlockState state, Random rand, int fortune) {
         return SimpleItems.moses_staff;
     }
-
 
 }

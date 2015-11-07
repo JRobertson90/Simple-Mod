@@ -25,10 +25,10 @@ public class SimpleRegistry {
 		
 		GameRegistry.registerBlock(SimpleBlocks.glass_stairs, "glass_stairs");
 		GameRegistry.registerBlock(SimpleBlocks.dirt_stairs, "dirt_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.leaves_oak_stairs, "leaves_oak_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.leaves_spruce_stairs, "leaves_spruce_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.leaves_birch_stairs, "leaves_birch_stairs");
-		GameRegistry.registerBlock(SimpleBlocks.leaves_jungle_stairs, "leaves_jungle_stairs");
+//		GameRegistry.registerBlock(SimpleBlocks.leaves_oak_stairs, "leaves_oak_stairs");
+//		GameRegistry.registerBlock(SimpleBlocks.leaves_spruce_stairs, "leaves_spruce_stairs");
+//		GameRegistry.registerBlock(SimpleBlocks.leaves_birch_stairs, "leaves_birch_stairs");
+//		GameRegistry.registerBlock(SimpleBlocks.leaves_jungle_stairs, "leaves_jungle_stairs");
 
 		ItemBedColor.register();
 		

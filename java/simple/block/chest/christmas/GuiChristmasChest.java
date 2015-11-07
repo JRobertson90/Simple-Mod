@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL11;
 
 public class GuiChristmasChest extends GuiContainer {
 
-	private static final ResourceLocation christmasChestResourceLocation = new ResourceLocation("acm:textures/gui/container/christmas_chest.png");
+	private static final ResourceLocation christmasChestResourceLocation = new ResourceLocation("simple:textures/gui/container/christmas_chest.png");
 
     /**
      * window height is calculated with this values, the more rows, the heigher

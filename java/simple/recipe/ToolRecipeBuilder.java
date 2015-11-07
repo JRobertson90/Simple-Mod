@@ -55,7 +55,7 @@ public class ToolRecipeBuilder {
 
     private Object[] merge(ToolRecipe recipe) {
         List<Object> params = Lists.newArrayList(recipe.getTemplate());
-        params.addAll(Lists.newArrayList("X", material, "#", Items.stick));
+        params.addAll(Lists.newArrayList('X', material, '#', Items.stick));
         return params.toArray();
     }
 
