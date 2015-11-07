@@ -1,6 +1,8 @@
 package jayperdu_simple.block;
 
 import java.util.Random;
+
+import jayperdu_simple.SimpleMod;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
@@ -10,20 +12,21 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class BlockLightAir extends Block {
 
+	public static boolean DEBUG_MODE = true;
+	public static final String NAME = "light_block_air";
+
 	public BlockLightAir() {
-		super(Material.vine); // WHy is this vine!?
+		super(Material.air);
 		setLightLevel(1.0F);
 		setLightOpacity(0);
-		setHardness(-1);
-		setResistance(6000000);
-		setUnlocalizedName("light_block_air");
-		if (BlockLight.DEBUG_MODE) {
+		setBlockUnbreakable();
+		setUnlocalizedName(SimpleMod.ID + ":" + NAME);
+		if (DEBUG_MODE) {
 			setBlockBounds(3/8.0F, 3/8.0F, 3/8.0F, 5/8.0F, 5/8.0F, 5/8.0F);
-		}
-		else {
+		} else {
 			setBlockBounds(0F, 0F, 0F, 0F, 0F, 0F);
 		}
-		GameRegistry.registerBlock(SimpleBlocks.light_block_air, "light_block_air");
+		GameRegistry.registerBlock(this, NAME);
 	}
 	
 	@Override
@@ -43,13 +46,18 @@ public class BlockLightAir extends Block {
 	
 	@Override
 	public boolean isLeaves(IBlockAccess world, BlockPos pos) {
-		// This is needed so that trees can grow close to this block.
+		// This is supposedly needed so that trees can grow close to this block.
 		return true;
 	}
 
 	@Override
 	public boolean isNormalCube() {
 		return false;
+	}
+
+	@Override
+	public boolean isFullCube() {
+		return ! DEBUG_MODE;
 	}
 	
 	@Override
@@ -64,7 +72,8 @@ public class BlockLightAir extends Block {
 
 	@Override
 	public int getRenderType() {
-		return -1;
+		// -1 means don't render it (i.e. air)
+		return DEBUG_MODE ? super.getRenderType() : -1;
 	}
 
 }

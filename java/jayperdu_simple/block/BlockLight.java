@@ -1,5 +1,6 @@
 package jayperdu_simple.block;
 
+import jayperdu_simple.SimpleMod;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
@@ -17,11 +18,11 @@ import java.util.Queue;
 
 public class BlockLight extends Block {
 
-	public static boolean DEBUG_MODE = false;
+	public static final String NAME = "light_block";
 
 	// I'm using this coordinate as a marker to know when to increment the distance
 	private static final BlockPos MARKER = new BlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-	private static final int MAX_RANGE = 3;
+	private static final int MAX_RANGE = 8;
 
 	private static HashSet<BlockPos> alreadyVisited;
 	private static Queue<BlockPos> diffusionQueue;
@@ -30,25 +31,29 @@ public class BlockLight extends Block {
 	public BlockLight() {
 		super(Material.cloth);
 		setHardness(1.5F);
-		setUnlocalizedName("light_block");
+		setUnlocalizedName(SimpleMod.ID + ":" + NAME);
 		setCreativeTab(CreativeTabs.tabBlock);
-		GameRegistry.registerBlock(SimpleBlocks.light_block, "light_block");
-		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.light_block, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
+		GameRegistry.registerBlock(this, NAME);
+		GameRegistry.addRecipe(new ItemStack(this, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
+	}
+
+	private enum BlockLightAction {
+		ADD, REMOVE
 	}
 	
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, true);
+		diffuseLight(worldIn, pos, BlockLightAction.ADD);
 		super.onBlockAdded(worldIn, pos, state);
 	}
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, false);
+		diffuseLight(worldIn, pos, BlockLightAction.REMOVE);
 		super.breakBlock(worldIn, pos, state);
 	}
 
-	private void diffuseLight(World world, BlockPos pos, boolean placed) {
+	private void diffuseLight(World world, BlockPos pos, BlockLightAction action) {
 
 		if( ! world.isRemote) {
 
@@ -70,13 +75,13 @@ public class BlockLight extends Block {
 					}
 				}
 				else {
-					diffuseLightRec(world, next, placed);
+					diffuseLightRec(world, next, action);
 				}
 			}
 		}
 	}
 
-	private void diffuseLightRec(World world, BlockPos pos, boolean placed) {
+	private void diffuseLightRec(World world, BlockPos pos, BlockLightAction action) {
 
 		if(alreadyVisited.contains(pos)) {
 			return;
@@ -95,7 +100,7 @@ public class BlockLight extends Block {
 		Block block = world.getBlockState(pos).getBlock();
 
 		if (block != null && block.isAir(world, pos)) {
-			placeInvisLightBlock(world, pos, placed);
+			handleAirBlock(world, pos, action);
 			addNeighborsToQueue(pos);
 		}
 	}
@@ -105,47 +110,48 @@ public class BlockLight extends Block {
 		diffusionQueue.add(pos.south());
 		diffusionQueue.add(pos.north());
 		diffusionQueue.add(pos.up());
-//		diffusionQueue.add(pos.up().south());
-//		diffusionQueue.add(pos.up().north());
+		diffusionQueue.add(pos.up().south());
+		diffusionQueue.add(pos.up().north());
 		diffusionQueue.add(pos.down());
-//		diffusionQueue.add(pos.down().south());
-//		diffusionQueue.add(pos.down().north());
+		diffusionQueue.add(pos.down().south());
+		diffusionQueue.add(pos.down().north());
 
 		diffusionQueue.add(pos.east());
-//		diffusionQueue.add(pos.east().south());
-//		diffusionQueue.add(pos.east().north());
-//		diffusionQueue.add(pos.east().up());
-//		diffusionQueue.add(pos.east().up().south());
-//		diffusionQueue.add(pos.east().up().north());
-//		diffusionQueue.add(pos.east().down());
-//		diffusionQueue.add(pos.east().down().south());
-//		diffusionQueue.add(pos.east().down().north());
+		diffusionQueue.add(pos.east().south());
+		diffusionQueue.add(pos.east().north());
+		diffusionQueue.add(pos.east().up());
+		diffusionQueue.add(pos.east().up().south());
+		diffusionQueue.add(pos.east().up().north());
+		diffusionQueue.add(pos.east().down());
+		diffusionQueue.add(pos.east().down().south());
+		diffusionQueue.add(pos.east().down().north());
 
 		diffusionQueue.add(pos.west());
-//		diffusionQueue.add(pos.west().south());
-//		diffusionQueue.add(pos.west().north());
-//		diffusionQueue.add(pos.west().up());
-//		diffusionQueue.add(pos.west().up().south());
-//		diffusionQueue.add(pos.west().up().north());
-//		diffusionQueue.add(pos.west().down());
-//		diffusionQueue.add(pos.west().south());
-//		diffusionQueue.add(pos.west().north());
+		diffusionQueue.add(pos.west().south());
+		diffusionQueue.add(pos.west().north());
+		diffusionQueue.add(pos.west().up());
+		diffusionQueue.add(pos.west().up().south());
+		diffusionQueue.add(pos.west().up().north());
+		diffusionQueue.add(pos.west().down());
+		diffusionQueue.add(pos.west().south());
+		diffusionQueue.add(pos.west().north());
 	}
 
-	private void placeInvisLightBlock(World world, BlockPos pos, boolean blockPlaced) {
+	private void handleAirBlock(World world, BlockPos pos, BlockLightAction action) {
 
-		Block block = world.getBlockState(pos).getBlock();
-
-		if (block == null && blockPlaced) {
-			world.setBlockState(pos, SimpleBlocks.light_block_air.getDefaultState());
-			world.markBlockForUpdate(pos);
-			world.notifyLightSet(pos);
-		}
-
-		if( ! blockPlaced) {
-			world.setBlockState(pos, Blocks.air.getDefaultState());
-			world.markBlockForUpdate(pos);
+		switch (action) {
+			case ADD: {
+				world.setBlockState(pos, SimpleBlocks.light_block_air.getDefaultState());
+				world.markBlockForUpdate(pos);
+				world.notifyLightSet(pos);
+				break;
+			}
+			case REMOVE: {
+				world.setBlockState(pos, Blocks.air.getDefaultState());
+				world.markBlockForUpdate(pos);
+				world.notifyLightSet(pos);
+				break;
+			}
 		}
 	}
-	
 }

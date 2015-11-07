@@ -1,5 +1,2 @@
-tile.light_block.name=Light Block
-item.light_block.name=Light Block
-
-tile.light_block_air.name=Light Block Air
-item.light_block_air.name=Light Block Air
+tile.jayperdu_simple:light_block.name=Light Block
+item.jayperdu_simple:light_block.name=Light Block
