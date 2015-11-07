@@ -1,7 +1,6 @@
 package jayperdu_simple;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -26,7 +25,7 @@ public class SimpleMod {
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
 		loadRecipes();
-		increaseStackSizes(egg, snowball, acacia_door, birch_door, dark_oak_door, iron_door, jungle_door, oak_door, spruce_door, sign);
+		increaseStackSizes();
 	}
 
 	private static void loadRecipes() {
@@ -34,7 +33,8 @@ public class SimpleMod {
 		GameRegistry.addShapelessRecipe(new ItemStack(Blocks.sand, 4), Blocks.sandstone);
 	}
 
-	private static void increaseStackSizes(Item... items) {
+	private static void increaseStackSizes() {
+		final Item[] items = {egg, snowball, acacia_door, birch_door, dark_oak_door, iron_door, jungle_door, oak_door, spruce_door, sign};
 		for(Item i : items) {
 			i.setMaxStackSize(64);
 		}
