@@ -1,4 +1,4 @@
-package simple;
+package jayperdu_simple;
 
 /**
  * Created by Jason Robertson on 6/21/15.

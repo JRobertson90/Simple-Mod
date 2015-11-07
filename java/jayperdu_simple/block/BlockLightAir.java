@@ -1,4 +1,4 @@
-package simple.block;
+package jayperdu_simple.block;
 
 import java.util.Random;
 import net.minecraft.block.*;

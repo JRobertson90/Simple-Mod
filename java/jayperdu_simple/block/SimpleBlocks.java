@@ -1,4 +1,4 @@
-package simple.block;
+package jayperdu_simple.block;
 
 import net.minecraft.block.Block;
 

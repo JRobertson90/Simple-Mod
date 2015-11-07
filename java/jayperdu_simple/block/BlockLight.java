@@ -1,12 +1,15 @@
-package simple.block;
+package jayperdu_simple.block;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.Items;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.*;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -18,7 +21,7 @@ public class BlockLight extends Block {
 
 	// I'm using this coordinate as a marker to know when to increment the distance
 	private static final BlockPos MARKER = new BlockPos(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE);
-	private static final int MAX_RANGE = 8;
+	private static final int MAX_RANGE = 3;
 
 	private static HashSet<BlockPos> alreadyVisited;
 	private static Queue<BlockPos> diffusionQueue;
@@ -29,6 +32,9 @@ public class BlockLight extends Block {
 		setHardness(1.5F);
 		setUnlocalizedName("light_block");
 		setCreativeTab(CreativeTabs.tabBlock);
+		GameRegistry.registerBlock(SimpleBlocks.light_block, "light_block");
+		GameRegistry.registerBlock(SimpleBlocks.light_block_air, "light_block_air");
+		GameRegistry.addRecipe(new ItemStack(SimpleBlocks.light_block, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
 	}
 	
 	@Override
@@ -77,6 +83,8 @@ public class BlockLight extends Block {
 			return;
 		}
 
+		alreadyVisited.add(pos);
+
 		if(distance > MAX_RANGE) {
 			return;
 		}
@@ -98,31 +106,31 @@ public class BlockLight extends Block {
 		diffusionQueue.add(pos.south());
 		diffusionQueue.add(pos.north());
 		diffusionQueue.add(pos.up());
-		diffusionQueue.add(pos.up().south());
-		diffusionQueue.add(pos.up().north());
+//		diffusionQueue.add(pos.up().south());
+//		diffusionQueue.add(pos.up().north());
 		diffusionQueue.add(pos.down());
-		diffusionQueue.add(pos.down().south());
-		diffusionQueue.add(pos.down().north());
+//		diffusionQueue.add(pos.down().south());
+//		diffusionQueue.add(pos.down().north());
 
 		diffusionQueue.add(pos.east());
-		diffusionQueue.add(pos.east().south());
-		diffusionQueue.add(pos.east().north());
-		diffusionQueue.add(pos.east().up());
-		diffusionQueue.add(pos.east().up().south());
-		diffusionQueue.add(pos.east().up().north());
-		diffusionQueue.add(pos.east().down());
-		diffusionQueue.add(pos.east().down().south());
-		diffusionQueue.add(pos.east().down().north());
+//		diffusionQueue.add(pos.east().south());
+//		diffusionQueue.add(pos.east().north());
+//		diffusionQueue.add(pos.east().up());
+//		diffusionQueue.add(pos.east().up().south());
+//		diffusionQueue.add(pos.east().up().north());
+//		diffusionQueue.add(pos.east().down());
+//		diffusionQueue.add(pos.east().down().south());
+//		diffusionQueue.add(pos.east().down().north());
 
 		diffusionQueue.add(pos.west());
-		diffusionQueue.add(pos.west().south());
-		diffusionQueue.add(pos.west().north());
-		diffusionQueue.add(pos.west().up());
-		diffusionQueue.add(pos.west().up().south());
-		diffusionQueue.add(pos.west().up().north());
-		diffusionQueue.add(pos.west().down());
-		diffusionQueue.add(pos.west().south());
-		diffusionQueue.add(pos.west().north());
+//		diffusionQueue.add(pos.west().south());
+//		diffusionQueue.add(pos.west().north());
+//		diffusionQueue.add(pos.west().up());
+//		diffusionQueue.add(pos.west().up().south());
+//		diffusionQueue.add(pos.west().up().north());
+//		diffusionQueue.add(pos.west().down());
+//		diffusionQueue.add(pos.west().south());
+//		diffusionQueue.add(pos.west().north());
 	}
 
 	private void placeInvisLightBlock(World world, BlockPos pos, boolean blockPlaced) {
@@ -138,7 +146,6 @@ public class BlockLight extends Block {
 		if( ! blockPlaced) {
 			world.setBlockState(pos, Blocks.air.getDefaultState());
 			world.markBlockForUpdate(pos);
-//			world.notifyLightSet(pos); // Not sure why this is commented out
 		}
 	}
 	

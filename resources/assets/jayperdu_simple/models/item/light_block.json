@@ -1,5 +1,5 @@
 {
-    "parent": "simple:block/light_block_air",
+    "parent": "jayperdu_simple:block/light_block",
     "display": {
         "thirdperson": {
             "rotation": [ 10, -45, 170 ],
