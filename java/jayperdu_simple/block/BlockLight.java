@@ -15,6 +15,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Set;
 
 public class BlockLight extends Block {
 
@@ -26,7 +27,7 @@ public class BlockLight extends Block {
 
 	private static HashSet<BlockPos> alreadyVisited;
 	private static Queue<BlockPos> diffusionQueue;
-	private static int distance;
+	private static Integer distance;
 
 	public BlockLight() {
 		super(Material.cloth);
@@ -37,23 +38,19 @@ public class BlockLight extends Block {
 		GameRegistry.addRecipe(new ItemStack(this, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
 	}
 
-	private enum BlockLightAction {
-		ADD, REMOVE
-	}
-	
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, BlockLightAction.ADD);
+		diffuseLight(worldIn, pos, true);
 		super.onBlockAdded(worldIn, pos, state);
 	}
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, BlockLightAction.REMOVE);
+		diffuseLight(worldIn, pos, false);
 		super.breakBlock(worldIn, pos, state);
 	}
 
-	private void diffuseLight(World world, BlockPos pos, BlockLightAction action) {
+	private void diffuseLight(World world, BlockPos pos, boolean placeBlock) {
 
 		if( ! world.isRemote) {
 
@@ -61,8 +58,8 @@ public class BlockLight extends Block {
 			alreadyVisited.add(pos);
 			diffusionQueue = new LinkedList<BlockPos>();
 			diffusionQueue.add(MARKER);
-			distance = 1;
-			addNeighborsToQueue(pos);
+			distance = 0;
+			queueUpNeighbors(pos);
 
 			while(diffusionQueue.size() > 0) {
 
@@ -75,13 +72,17 @@ public class BlockLight extends Block {
 					}
 				}
 				else {
-					diffuseLightRec(world, next, action);
+					diffuseLightRec(world, next, placeBlock);
 				}
 			}
+
+			alreadyVisited = null;
+			diffusionQueue = null;
+			distance = null;
 		}
 	}
 
-	private void diffuseLightRec(World world, BlockPos pos, BlockLightAction action) {
+	private void diffuseLightRec(World world, BlockPos pos, boolean placeBlock) {
 
 		if(alreadyVisited.contains(pos)) {
 			return;
@@ -100,58 +101,49 @@ public class BlockLight extends Block {
 		Block block = world.getBlockState(pos).getBlock();
 
 		if (block != null && block.isAir(world, pos)) {
-			handleAirBlock(world, pos, action);
-			addNeighborsToQueue(pos);
-		}
-	}
-
-	private void addNeighborsToQueue(BlockPos pos) {
-
-		diffusionQueue.add(pos.south());
-		diffusionQueue.add(pos.north());
-		diffusionQueue.add(pos.up());
-		diffusionQueue.add(pos.up().south());
-		diffusionQueue.add(pos.up().north());
-		diffusionQueue.add(pos.down());
-		diffusionQueue.add(pos.down().south());
-		diffusionQueue.add(pos.down().north());
-
-		diffusionQueue.add(pos.east());
-		diffusionQueue.add(pos.east().south());
-		diffusionQueue.add(pos.east().north());
-		diffusionQueue.add(pos.east().up());
-		diffusionQueue.add(pos.east().up().south());
-		diffusionQueue.add(pos.east().up().north());
-		diffusionQueue.add(pos.east().down());
-		diffusionQueue.add(pos.east().down().south());
-		diffusionQueue.add(pos.east().down().north());
-
-		diffusionQueue.add(pos.west());
-		diffusionQueue.add(pos.west().south());
-		diffusionQueue.add(pos.west().north());
-		diffusionQueue.add(pos.west().up());
-		diffusionQueue.add(pos.west().up().south());
-		diffusionQueue.add(pos.west().up().north());
-		diffusionQueue.add(pos.west().down());
-		diffusionQueue.add(pos.west().south());
-		diffusionQueue.add(pos.west().north());
-	}
-
-	private void handleAirBlock(World world, BlockPos pos, BlockLightAction action) {
-
-		switch (action) {
-			case ADD: {
+			if(placeBlock) {
 				world.setBlockState(pos, SimpleBlocks.light_block_air.getDefaultState());
-				world.markBlockForUpdate(pos);
-				world.notifyLightSet(pos);
-				break;
+			} else {
+				world.setBlockToAir(pos);
 			}
-			case REMOVE: {
-				world.setBlockState(pos, Blocks.air.getDefaultState());
-				world.markBlockForUpdate(pos);
-				world.notifyLightSet(pos);
-				break;
-			}
+			queueUpNeighbors(pos);
 		}
+	}
+
+	private void queueUpNeighbors(BlockPos pos) {
+
+		Set<BlockPos> neighbors = new HashSet<BlockPos>();
+
+		neighbors.add(pos.south());
+		neighbors.add(pos.north());
+		neighbors.add(pos.up());
+		neighbors.add(pos.up().south());
+		neighbors.add(pos.up().north());
+		neighbors.add(pos.down());
+		neighbors.add(pos.down().south());
+		neighbors.add(pos.down().north());
+
+		neighbors.add(pos.east());
+		neighbors.add(pos.east().south());
+		neighbors.add(pos.east().north());
+		neighbors.add(pos.east().up());
+		neighbors.add(pos.east().up().south());
+		neighbors.add(pos.east().up().north());
+		neighbors.add(pos.east().down());
+		neighbors.add(pos.east().down().south());
+		neighbors.add(pos.east().down().north());
+
+		neighbors.add(pos.west());
+		neighbors.add(pos.west().south());
+		neighbors.add(pos.west().north());
+		neighbors.add(pos.west().up());
+		neighbors.add(pos.west().up().south());
+		neighbors.add(pos.west().up().north());
+		neighbors.add(pos.west().down());
+		neighbors.add(pos.west().south());
+		neighbors.add(pos.west().north());
+
+		neighbors.removeAll(alreadyVisited);
+		diffusionQueue.addAll(neighbors);
 	}
 }
