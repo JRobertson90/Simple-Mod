@@ -1,7 +1,7 @@
-package jayperdu_simple;
+package xaeroxe_jayperdu_acm;
 
-import jayperdu_simple.block.BlockLight;
-import jayperdu_simple.block.SimpleBlocks;
+import xaeroxe_jayperdu_acm.block.BlockLight;
+import xaeroxe_jayperdu_acm.block.SimpleBlocks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -20,7 +20,7 @@ import static net.minecraft.init.Items.*;
 
 @Mod(modid= SimpleMod.ID, name= SimpleMod.NAME, version = SimpleMod.VERSION)
 public class SimpleMod {
-	public static final String ID = "jayperdu_simple";
+	public static final String ID = "xaeroxe_jayperdu_acm";
 	public static final String NAME = "Simple Mod";
 	public static final String VERSION = "1.8-11.14.3.1450-forge";
 

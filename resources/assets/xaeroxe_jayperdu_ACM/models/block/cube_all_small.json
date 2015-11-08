@@ -1,5 +1,5 @@
 {
-    "parent": "jayperdu_simple:block/cube_small",
+    "parent": "xaeroxe_jayperdu_acm:block/cube_small",
     "textures": {
         "particle": "#all",
         "down": "#all",

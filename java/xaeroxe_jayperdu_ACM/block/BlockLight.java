@@ -1,6 +1,6 @@
-package jayperdu_simple.block;
+package xaeroxe_jayperdu_acm.block;
 
-import jayperdu_simple.SimpleMod;
+import xaeroxe_jayperdu_acm.SimpleMod;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
@@ -36,24 +36,20 @@ public class BlockLight extends Block {
 		GameRegistry.registerBlock(this, NAME);
 		GameRegistry.addRecipe(new ItemStack(this, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
 	}
-
-	private enum BlockLightAction {
-		ADD, REMOVE
-	}
 	
 	@Override
 	public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, BlockLightAction.ADD);
+		diffuseLight(worldIn, pos, true);
 		super.onBlockAdded(worldIn, pos, state);
 	}
 
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-		diffuseLight(worldIn, pos, BlockLightAction.REMOVE);
+		diffuseLight(worldIn, pos, false);
 		super.breakBlock(worldIn, pos, state);
 	}
 
-	private void diffuseLight(World world, BlockPos pos, BlockLightAction action) {
+	private void diffuseLight(World world, BlockPos pos, boolean placeBlock) {
 
 		if( ! world.isRemote) {
 
@@ -75,13 +71,13 @@ public class BlockLight extends Block {
 					}
 				}
 				else {
-					diffuseLightRec(world, next, action);
+					diffuseLightRec(world, next, placeBlock);
 				}
 			}
 		}
 	}
 
-	private void diffuseLightRec(World world, BlockPos pos, BlockLightAction action) {
+	private void diffuseLightRec(World world, BlockPos pos, boolean placeBlock) {
 
 		if(alreadyVisited.contains(pos)) {
 			return;
@@ -100,7 +96,7 @@ public class BlockLight extends Block {
 		Block block = world.getBlockState(pos).getBlock();
 
 		if (block != null && block.isAir(world, pos)) {
-			handleAirBlock(world, pos, action);
+			handleAirBlock(world, pos, placeBlock);
 			addNeighborsToQueue(pos);
 		}
 	}
@@ -137,21 +133,10 @@ public class BlockLight extends Block {
 		diffusionQueue.add(pos.west().north());
 	}
 
-	private void handleAirBlock(World world, BlockPos pos, BlockLightAction action) {
-
-		switch (action) {
-			case ADD: {
-				world.setBlockState(pos, SimpleBlocks.light_block_air.getDefaultState());
-				world.markBlockForUpdate(pos);
-				world.notifyLightSet(pos);
-				break;
-			}
-			case REMOVE: {
-				world.setBlockState(pos, Blocks.air.getDefaultState());
-				world.markBlockForUpdate(pos);
-				world.notifyLightSet(pos);
-				break;
-			}
-		}
+	private void handleAirBlock(World world, BlockPos pos, boolean placeBlock) {
+		Block block = placeBlock ? SimpleBlocks.light_block_air : Blocks.air;
+		world.setBlockState(pos, block.getDefaultState());
+		world.markBlockForUpdate(pos);
+		world.notifyLightSet(pos);
 	}
 }

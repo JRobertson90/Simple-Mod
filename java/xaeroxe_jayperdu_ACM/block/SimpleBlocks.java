@@ -1,4 +1,4 @@
-package jayperdu_simple.block;
+package xaeroxe_jayperdu_acm.block;
 
 import net.minecraft.block.Block;
 

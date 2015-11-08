@@ -1,4 +1,4 @@
-package jayperdu_simple;
+package xaeroxe_jayperdu_acm;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.UUID;
 
-import static jayperdu_simple.SimpleModSettings.*;
+import static xaeroxe_jayperdu_acm.SimpleModSettings.*;
 
 public class SimplePlayerModifier {
 

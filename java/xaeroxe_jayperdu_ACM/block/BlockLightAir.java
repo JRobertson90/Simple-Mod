@@ -1,8 +1,8 @@
-package jayperdu_simple.block;
+package xaeroxe_jayperdu_acm.block;
 
 import java.util.Random;
 
-import jayperdu_simple.SimpleMod;
+import xaeroxe_jayperdu_acm.SimpleMod;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
@@ -12,8 +12,8 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class BlockLightAir extends Block {
 
-	public static boolean DEBUG_MODE = true;
-	public static final String NAME = "light_block_air";
+	public static boolean DEBUG_MODE = false;
+	public static final String NAME = "light_block_beam";
 
 	public BlockLightAir() {
 		super(Material.air);
