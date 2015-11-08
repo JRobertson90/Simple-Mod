@@ -2,13 +2,18 @@ package jayperdu_simple;
 
 import jayperdu_simple.block.BlockLight;
 import jayperdu_simple.block.SimpleBlocks;
+import jayperdu_simple.block.chest.crafting.BlockCraftingChest;
+import jayperdu_simple.block.chest.crafting.TileEntityCraftingChest;
+import jayperdu_simple.block.chest.crafting.TileEntityCraftingChestRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLStateEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -24,9 +29,13 @@ public class SimpleMod {
 	public static final String NAME = "Simple Mod";
 	public static final String VERSION = "1.8-11.14.3.1450-forge";
 
+	@Mod.Instance(value = SimpleMod.ID)
+	public static SimpleMod INSTANCE;
+
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		SimplePlayerModifier.setup();
+		NetworkRegistry.INSTANCE.registerGuiHandler(SimpleMod.INSTANCE, new SimpleGuiHandler());
 	}
 
 	@EventHandler
@@ -52,6 +61,8 @@ public class SimpleMod {
 		if(event.getSide() == Side.CLIENT) {
 			RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.light_block), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockLight.NAME, "inventory"));
+			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.crafting_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockCraftingChest.NAME, "inventory"));
+			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCraftingChest.class, new TileEntityCraftingChestRenderer());
 		}
 	}
 
