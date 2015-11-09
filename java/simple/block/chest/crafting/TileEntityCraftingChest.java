@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm.block.chest.crafting;
+package simple.block.chest.crafting;
 
 import java.util.ArrayList;
 import java.util.Iterator;

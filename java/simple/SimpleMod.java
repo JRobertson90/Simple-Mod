@@ -1,14 +1,13 @@
-package xaeroxe_jayperdu_acm;
+package simple;
 
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import xaeroxe_jayperdu_acm.block.BlockLight;
-import xaeroxe_jayperdu_acm.block.SimpleBlocks;
-import xaeroxe_jayperdu_acm.block.chest.christmas.BlockChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChestRenderer;
-import xaeroxe_jayperdu_acm.block.chest.crafting.BlockCraftingChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChestRenderer;
+import simple.block.BlockLight;
+import simple.block.SimpleBlocks;
+import simple.block.chest.christmas.BlockChristmasChest;
+import simple.block.chest.christmas.TileEntityChristmasChest;
+import simple.block.chest.christmas.TileEntityChristmasChestRenderer;
+import simple.block.chest.crafting.BlockCraftingChest;
+import simple.block.chest.crafting.TileEntityCraftingChest;
+import simple.block.chest.crafting.TileEntityCraftingChestRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderItem;
 import net.minecraft.client.resources.model.ModelResourceLocation;

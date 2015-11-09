@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm.block.chest.christmas;
+package simple.block.chest.christmas;
 
 import net.minecraft.tileentity.TileEntityChest;
 

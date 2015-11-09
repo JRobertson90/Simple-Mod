@@ -1,8 +1,8 @@
-package xaeroxe_jayperdu_acm.block;
+package simple.block;
 
 import net.minecraft.block.BlockChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.BlockChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.BlockCraftingChest;
+import simple.block.chest.christmas.BlockChristmasChest;
+import simple.block.chest.crafting.BlockCraftingChest;
 import net.minecraft.block.Block;
 
 public class SimpleBlocks {

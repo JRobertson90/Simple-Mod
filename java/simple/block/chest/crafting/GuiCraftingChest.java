@@ -1,6 +1,6 @@
-package xaeroxe_jayperdu_acm.block.chest.crafting;
+package simple.block.chest.crafting;
 
-import xaeroxe_jayperdu_acm.SimpleMod;
+import simple.SimpleMod;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;

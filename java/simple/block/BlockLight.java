@@ -1,6 +1,6 @@
-package xaeroxe_jayperdu_acm.block;
+package simple.block;
 
-import xaeroxe_jayperdu_acm.SimpleMod;
+import simple.SimpleMod;
 import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;

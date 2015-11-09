@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm.block.chest.crafting;
+package simple.block.chest.crafting;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;

@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm.block.chest.christmas;
+package simple.block.chest.christmas;
 
 import net.minecraft.block.BlockChest;
 import net.minecraft.block.state.IBlockState;
@@ -12,7 +12,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.ILockableContainer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import xaeroxe_jayperdu_acm.SimpleMod;
+import simple.SimpleMod;
 
 public class BlockChristmasChest extends BlockChest {
 

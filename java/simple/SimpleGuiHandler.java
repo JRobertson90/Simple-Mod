@@ -1,12 +1,12 @@
-package xaeroxe_jayperdu_acm;
+package simple;
 
 import net.minecraft.inventory.ContainerChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.BlockChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.GuiChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.ContainerCraftingChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.GuiCraftingChest;
-import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChest;
+import simple.block.chest.christmas.BlockChristmasChest;
+import simple.block.chest.christmas.GuiChristmasChest;
+import simple.block.chest.christmas.TileEntityChristmasChest;
+import simple.block.chest.crafting.ContainerCraftingChest;
+import simple.block.chest.crafting.GuiCraftingChest;
+import simple.block.chest.crafting.TileEntityCraftingChest;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockPos;

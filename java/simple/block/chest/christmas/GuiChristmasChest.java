@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm.block.chest.christmas;
+package simple.block.chest.christmas;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.EntityPlayer;
@@ -7,7 +7,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
-import xaeroxe_jayperdu_acm.SimpleMod;
+import simple.SimpleMod;
 
 public class GuiChristmasChest extends GuiContainer {
 

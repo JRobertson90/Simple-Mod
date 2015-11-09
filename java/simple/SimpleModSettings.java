@@ -1,4 +1,4 @@
-package xaeroxe_jayperdu_acm;
+package simple;
 
 /**
  * Created by Jason Robertson on 6/21/15.

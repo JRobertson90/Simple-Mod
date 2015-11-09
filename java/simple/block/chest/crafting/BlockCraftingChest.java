@@ -1,6 +1,6 @@
-package xaeroxe_jayperdu_acm.block.chest.crafting;
+package simple.block.chest.crafting;
 
-import xaeroxe_jayperdu_acm.SimpleMod;
+import simple.SimpleMod;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
