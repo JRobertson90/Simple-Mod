@@ -13,7 +13,7 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 public class BlockLightAir extends Block {
 
 	public static boolean DEBUG_MODE = false;
-	public static final String NAME = "light_block_beam";
+	public static final String NAME = "light_block_air";
 
 	public BlockLightAir() {
 		super(Material.air);

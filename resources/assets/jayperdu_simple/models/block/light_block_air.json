@@ -1,6 +1,6 @@
 {
     "parent": "jayperdu_simple:block/cube_all_small",
     "textures": {
-        "all": "jayperdu_simple:blocks/light_block_beam"
+        "all": "jayperdu_simple:blocks/light_block_air"
     }
 }
