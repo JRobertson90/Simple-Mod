@@ -2,7 +2,7 @@
   "parent": "block/cube",
   "textures": {
     "particle": "jayperdu_simple:blocks/christmas_chest_side",
-    "down": "jayperdu_simple:blocks/christmas_chest_side",
+    "down": "jayperdu_simple:blocks/christmas_chest_bottom",
     "up": "jayperdu_simple:blocks/christmas_chest_top",
     "north": "jayperdu_simple:blocks/christmas_chest_side",
     "east": "jayperdu_simple:blocks/christmas_chest_side",
