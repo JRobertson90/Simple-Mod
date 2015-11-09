@@ -1,5 +1,8 @@
 package xaeroxe_jayperdu_acm;
 
+import net.minecraft.inventory.ContainerChest;
+import xaeroxe_jayperdu_acm.block.chest.christmas.GuiChristmasChest;
+import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.ContainerCraftingChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.GuiCraftingChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChest;
@@ -18,9 +21,9 @@ public class SimpleGuiHandler implements IGuiHandler {
         if(tileEntity instanceof TileEntityCraftingChest){
             return new ContainerCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
         }
-//        else if(tileEntity instanceof TileEntityChristmasChest) {
-//            return new ContainerChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
-//        }
+        else if(tileEntity instanceof TileEntityChristmasChest) {
+            return new ContainerChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
+        }
         return null;
     }
 
@@ -32,9 +35,9 @@ public class SimpleGuiHandler implements IGuiHandler {
         if(tileEntity instanceof TileEntityCraftingChest){
             return new GuiCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
         }
-//        else if(tileEntity instanceof TileEntityChristmasChest) {
-//            return new GuiChristmasChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
-//        }
+        else if(tileEntity instanceof TileEntityChristmasChest) {
+            return new GuiChristmasChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
+        }
         return null;
     }
 

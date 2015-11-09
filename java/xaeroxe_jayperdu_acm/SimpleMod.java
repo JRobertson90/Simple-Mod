@@ -2,6 +2,8 @@ package xaeroxe_jayperdu_acm;
 
 import xaeroxe_jayperdu_acm.block.BlockLight;
 import xaeroxe_jayperdu_acm.block.SimpleBlocks;
+import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
+import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChestRenderer;
 import xaeroxe_jayperdu_acm.block.chest.crafting.BlockCraftingChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.TileEntityCraftingChestRenderer;
@@ -40,7 +42,6 @@ public class SimpleMod {
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		GameRegistry.registerTileEntity(TileEntityCraftingChest.class, "crafting_chest_tile");
 		loadRecipes();
 		increaseStackSizes();
 		registerItemRenderers(event);
@@ -63,7 +64,9 @@ public class SimpleMod {
 			RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.light_block), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockLight.NAME, "inventory"));
 			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.crafting_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockCraftingChest.NAME, "inventory"));
+			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.christmas_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockCraftingChest.NAME, "inventory"));
 			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCraftingChest.class, new TileEntityCraftingChestRenderer());
+			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChristmasChest.class, new TileEntityChristmasChestRenderer());
 		}
 	}
 
