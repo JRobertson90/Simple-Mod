@@ -16,12 +16,12 @@ import xaeroxe_jayperdu_acm.SimpleMod;
 @SideOnly(Side.CLIENT)
 public class TileEntityChristmasChestRenderer extends TileEntitySpecialRenderer
 {
-	private static final ResourceLocation textureTrappedDouble = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas_double.png");
-	private static final ResourceLocation textureChristmasDouble = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas_double.png");
-	private static final ResourceLocation textureNormalDouble = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas_double.png");
-	private static final ResourceLocation textureTrapped = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas.png");
-	private static final ResourceLocation textureChristmas = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas.png");
-	private static final ResourceLocation textureNormal = new ResourceLocation(SimpleMod.ID + ":textures/entity/chest/christmas.png");
+	private static final ResourceLocation textureTrappedDouble = new ResourceLocation("textures/entity/chest/trapped_double.png");
+	private static final ResourceLocation textureChristmasDouble = new ResourceLocation("textures/entity/chest/christmas_double.png");
+	private static final ResourceLocation textureNormalDouble = new ResourceLocation("textures/entity/chest/normal_double.png");
+	private static final ResourceLocation textureTrapped = new ResourceLocation("textures/entity/chest/trapped.png");
+	private static final ResourceLocation textureChristmas = new ResourceLocation("textures/entity/chest/christmas.png");
+	private static final ResourceLocation textureNormal = new ResourceLocation("textures/entity/chest/normal.png");
 	private ModelChest simpleChest = new ModelChest();
 	private ModelChest largeChest = new ModelLargeChest();
 	private boolean isChristams;
@@ -119,7 +119,7 @@ public class TileEntityChristmasChestRenderer extends TileEntitySpecialRenderer
 				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 			}
 
-			GlStateManager.translate((float)p_180538_2_, (float)p_180538_4_ + 1.0F, (float)p_180538_6_ + 1.0F);
+			GlStateManager.translate((float) p_180538_2_, (float) p_180538_4_ + 1.0F, (float) p_180538_6_ + 1.0F);
 			GlStateManager.scale(1.0F, -1.0F, -1.0F);
 			GlStateManager.translate(0.5F, 0.5F, 0.5F);
 			short short1 = 0;
@@ -154,7 +154,7 @@ public class TileEntityChristmasChestRenderer extends TileEntitySpecialRenderer
 				GlStateManager.translate(0.0F, 0.0F, -1.0F);
 			}
 
-			GlStateManager.rotate((float)short1, 0.0F, 1.0F, 0.0F);
+			GlStateManager.rotate((float) short1, 0.0F, 1.0F, 0.0F);
 			GlStateManager.translate(-0.5F, -0.5F, -0.5F);
 			float f1 = p_180538_1_.prevLidAngle + (p_180538_1_.lidAngle - p_180538_1_.prevLidAngle) * p_180538_8_;
 			float f2;
@@ -198,6 +198,6 @@ public class TileEntityChristmasChestRenderer extends TileEntitySpecialRenderer
 
 	public void renderTileEntityAt(TileEntity p_180535_1_, double posX, double posZ, double p_180535_6_, float p_180535_8_, int p_180535_9_)
 	{
-		this.func_180538_a((TileEntityChest)p_180535_1_, posX, posZ, p_180535_6_, p_180535_8_, p_180535_9_);
+		this.func_180538_a((TileEntityChest) p_180535_1_, posX, posZ, p_180535_6_, p_180535_8_, p_180535_9_);
 	}
 }
