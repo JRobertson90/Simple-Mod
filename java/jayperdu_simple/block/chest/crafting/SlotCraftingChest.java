@@ -17,17 +17,20 @@ import net.minecraft.stats.AchievementList;
 public class SlotCraftingChest extends Slot
 {
     /** The craft matrix inventory linked to this result slot. */
+    private final TileEntityCraftingChest craftingChest;
     private final InventoryCrafting craftMatrix;
+
     /** The player that is using the GUI where this slot resides. */
     private final EntityPlayer thePlayer;
     /** The number of items that have been crafted so far. Gets passed to ItemStack.onCrafting before being reset. */
     private int amountCrafted;
     private static final String __OBFID = "CL_00001761";
 
-    public SlotCraftingChest(EntityPlayer player, InventoryCrafting craftMatrix, IInventory p_i45790_3_, int slotIndex, int xPosition, int yPosition)
+    public SlotCraftingChest(EntityPlayer player, TileEntityCraftingChest craftingChest, InventoryCrafting craftMatrix, IInventory p_i45790_3_, int slotIndex, int xPosition, int yPosition)
     {
         super(p_i45790_3_, slotIndex, xPosition, yPosition);
         this.thePlayer = player;
+        this.craftingChest= craftingChest;
         this.craftMatrix = craftMatrix;
     }
 
@@ -133,7 +136,7 @@ public class SlotCraftingChest extends Slot
 
     public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
     {
-        net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(playerIn, stack, craftMatrix);
+        net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(playerIn, stack, craftingChest);
         this.onCrafting(stack);
         net.minecraftforge.common.ForgeHooks.setCraftingPlayer(playerIn);
         ItemStack[] aitemstack = CraftingManager.getInstance().func_180303_b(this.craftMatrix, playerIn.worldObj);
@@ -141,19 +144,19 @@ public class SlotCraftingChest extends Slot
 
         for (int i = 0; i < aitemstack.length; ++i)
         {
-            ItemStack itemstack1 = this.craftMatrix.getStackInSlot(i);
+            ItemStack itemstack1 = this.craftingChest.getStackInSlot(i + 48);
             ItemStack itemstack2 = aitemstack[i];
 
             if (itemstack1 != null)
             {
-                this.craftMatrix.decrStackSize(i, 1);
+                this.craftingChest.decrStackSize(i + 48, 1);
             }
 
             if (itemstack2 != null)
             {
-                if (this.craftMatrix.getStackInSlot(i) == null)
+                if (this.craftingChest.getStackInSlot(i + 48) == null)
                 {
-                    this.craftMatrix.setInventorySlotContents(i, itemstack2);
+                    this.craftingChest.setInventorySlotContents(i + 48, itemstack2);
                 }
                 else if (!this.thePlayer.inventory.addItemStackToInventory(itemstack2))
                 {

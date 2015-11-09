@@ -7,14 +7,12 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCraftResult;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.world.World;
 
 public class ContainerCraftingChest extends Container {
 
-    public final static int CRAFTING_SLOT_OFFSET = 48;
     private final static int SLOT_HEIGHT = 18;
     private final static int SLOT_WIDTH = 18;
     private int slotID = 0;
@@ -25,10 +23,7 @@ public class ContainerCraftingChest extends Container {
     private World worldObj;
 
     public InventoryCrafting craftMatrix = new InventoryCrafting(this, 3, 3) {
-        @Override public ItemStack getStackInSlotOnClosing(int par1){ return null; }
-//        @Override public ItemStack decrStackSize(int index, int count) { return super.decrStackSize(index + CRAFTING_SLOT_OFFSET, count); }
-//        @Override public ItemStack getStackInSlot(int index) { return super.getStackInSlot(index + CRAFTING_SLOT_OFFSET); }
-//        @Override public void setInventorySlotContents(int index, ItemStack stack) { super.setInventorySlotContents(index + CRAFTING_SLOT_OFFSET, stack); }
+       @Override public ItemStack getStackInSlotOnClosing(int par1){ return null; }
     };
 
     public ContainerCraftingChest (InventoryPlayer inventoryPlayer, TileEntityCraftingChest te, World world) {
@@ -72,15 +67,15 @@ public class ContainerCraftingChest extends Container {
 
                 int x = 44 + SLOT_WIDTH * col;
                 int y = 53 + SLOT_HEIGHT * row;
-                addSlotToContainer(new Slot(craftMatrix, col + row * 3, x, y));
+                addSlotToContainer(new Slot(tileEntity, slotID++, x, y));
             }
         }
 
         // Crafting result slot
-        addSlotToContainer(new SlotCrafting(inventoryPlayer.player, craftMatrix, this.craftResult, 0, 106, 71));
+        addSlotToContainer(new SlotCraftingChest(inventoryPlayer.player, tileEntity, craftMatrix, this.craftResult, 0, 106, 71));
     }
 
-    private void addPlayerInventory(InventoryPlayer inventoryPlayer) {
+    protected void addPlayerInventory(InventoryPlayer inventoryPlayer) {
 
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
