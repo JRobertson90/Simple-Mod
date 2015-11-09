@@ -13,6 +13,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemSword;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.stats.AchievementList;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerDestroyItemEvent;
 
 public class SlotCraftingChest extends Slot
 {
@@ -134,33 +136,39 @@ public class SlotCraftingChest extends Slot
         }
     }
 
-    public void onPickupFromSlot(EntityPlayer playerIn, ItemStack stack)
+    public void onPickupFromSlot(EntityPlayer par1EntityPlayer, ItemStack par2ItemStack)
     {
-        net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerCraftingEvent(playerIn, stack, craftingChest);
-        this.onCrafting(stack);
-        net.minecraftforge.common.ForgeHooks.setCraftingPlayer(playerIn);
-        ItemStack[] aitemstack = CraftingManager.getInstance().func_180303_b(this.craftMatrix, playerIn.worldObj);
-        net.minecraftforge.common.ForgeHooks.setCraftingPlayer(null);
+        this.onCrafting(par2ItemStack);
 
-        for (int i = 0; i < aitemstack.length; ++i)
+        for (int i = 0; i < 9; ++i)
         {
-            ItemStack itemstack1 = this.craftingChest.getStackInSlot(i + 48);
-            ItemStack itemstack2 = aitemstack[i];
+            ItemStack itemstack1 = craftingChest.getStackInSlot(i + 48);
 
             if (itemstack1 != null)
             {
                 this.craftingChest.decrStackSize(i + 48, 1);
-            }
 
-            if (itemstack2 != null)
-            {
-                if (this.craftingChest.getStackInSlot(i + 48) == null)
+                if (itemstack1.getItem().hasContainerItem())
                 {
-                    this.craftingChest.setInventorySlotContents(i + 48, itemstack2);
-                }
-                else if (!this.thePlayer.inventory.addItemStackToInventory(itemstack2))
-                {
-                    this.thePlayer.dropPlayerItemWithRandomChoice(itemstack2, false);
+                    ItemStack itemstack2 = itemstack1.getItem().getContainerItem(itemstack1);
+
+                    if (itemstack2.isItemStackDamageable() && itemstack2.getItemDamage() > itemstack2.getMaxDamage())
+                    {
+                        MinecraftForge.EVENT_BUS.post(new PlayerDestroyItemEvent(thePlayer, itemstack2));
+                        itemstack2 = null;
+                    }
+
+                    if (itemstack2 != null && !this.thePlayer.inventory.addItemStackToInventory(itemstack2))
+                    {
+                        if (this.craftingChest.getStackInSlot(i + 48) == null)
+                        {
+                            this.craftingChest.setInventorySlotContents(i + 48, itemstack2);
+                        }
+                        else
+                        {
+                            this.thePlayer.dropPlayerItemWithRandomChoice(itemstack2, false);
+                        }
+                    }
                 }
             }
         }
