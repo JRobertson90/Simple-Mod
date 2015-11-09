@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "xaeroxe_jayperdu_acm:blocks/crafting_chest_front",
+    "down": "blocks/planks_oak",
+    "up": "xaeroxe_jayperdu_acm:blocks/crafting_chest_top",
+    "north": "xaeroxe_jayperdu_acm:blocks/crafting_chest_front",
+    "east": "xaeroxe_jayperdu_acm:blocks/crafting_chest_left",
+    "south": "xaeroxe_jayperdu_acm:blocks/crafting_chest_back",
+    "west": "xaeroxe_jayperdu_acm:blocks/crafting_chest_right"
+  }
+}

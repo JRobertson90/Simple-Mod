@@ -1,0 +1,6 @@
+{
+    "parent": "xaeroxe_jayperdu_acm:block/cube_all_small",
+    "textures": {
+        "all": "xaeroxe_jayperdu_acm:blocks/light_block_beam"
+    }
+}

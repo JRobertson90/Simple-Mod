@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=south": { "model": "xaeroxe_jayperdu_acm:crafting_chest" },
+    "facing=west":  { "model": "xaeroxe_jayperdu_acm:crafting_chest", "y": 90 },
+    "facing=north": { "model": "xaeroxe_jayperdu_acm:crafting_chest", "y": 180 },
+    "facing=east":  { "model": "xaeroxe_jayperdu_acm:crafting_chest", "y": 270 }
+  }
+}

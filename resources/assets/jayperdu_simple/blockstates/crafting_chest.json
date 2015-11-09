@@ -1,8 +1,0 @@
-{
-  "variants": {
-    "facing=south": { "model": "jayperdu_simple:crafting_chest" },
-    "facing=west":  { "model": "jayperdu_simple:crafting_chest", "y": 90 },
-    "facing=north": { "model": "jayperdu_simple:crafting_chest", "y": 180 },
-    "facing=east":  { "model": "jayperdu_simple:crafting_chest", "y": 270 }
-  }
-}
