@@ -1,6 +1,7 @@
 package xaeroxe_jayperdu_acm;
 
 import net.minecraft.inventory.ContainerChest;
+import xaeroxe_jayperdu_acm.block.chest.christmas.BlockChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.christmas.GuiChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.crafting.ContainerCraftingChest;
@@ -22,21 +23,21 @@ public class SimpleGuiHandler implements IGuiHandler {
             return new ContainerCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
         }
         else if(tileEntity instanceof TileEntityChristmasChest) {
-            return new ContainerChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
+            return new ContainerChest(player.inventory, ((BlockChristmasChest) tileEntity.getBlockType()).getLockableContainer(world, pos), player);
         }
         return null;
     }
 
     @Override
     public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
-
-        TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+        BlockPos pos = new BlockPos(x, y, z);
+        TileEntity tileEntity = world.getTileEntity(pos);
 
         if(tileEntity instanceof TileEntityCraftingChest){
             return new GuiCraftingChest(player.inventory, (TileEntityCraftingChest) tileEntity, world);
         }
         else if(tileEntity instanceof TileEntityChristmasChest) {
-            return new GuiChristmasChest(player.inventory, (TileEntityChristmasChest) tileEntity, player);
+            return new GuiChristmasChest(player.inventory, ((BlockChristmasChest) tileEntity.getBlockType()).getLockableContainer(world, pos), player);
         }
         return null;
     }

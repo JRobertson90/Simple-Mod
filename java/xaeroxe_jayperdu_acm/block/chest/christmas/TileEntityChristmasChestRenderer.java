@@ -11,8 +11,8 @@ import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import xaeroxe_jayperdu_acm.SimpleMod;
 
+// Copied straight from TileEntityChestRenderer -- Changes: constructor --> isChristams = true
 @SideOnly(Side.CLIENT)
 public class TileEntityChristmasChestRenderer extends TileEntitySpecialRenderer
 {
