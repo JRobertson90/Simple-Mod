@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "jayperdu_simple:blocks/light_block"
+    }
+}

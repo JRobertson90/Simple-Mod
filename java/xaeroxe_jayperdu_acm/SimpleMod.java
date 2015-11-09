@@ -1,7 +1,9 @@
 package xaeroxe_jayperdu_acm;
 
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import xaeroxe_jayperdu_acm.block.BlockLight;
 import xaeroxe_jayperdu_acm.block.SimpleBlocks;
+import xaeroxe_jayperdu_acm.block.chest.christmas.BlockChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChest;
 import xaeroxe_jayperdu_acm.block.chest.christmas.TileEntityChristmasChestRenderer;
 import xaeroxe_jayperdu_acm.block.chest.crafting.BlockCraftingChest;
@@ -27,9 +29,9 @@ import static net.minecraft.init.Items.*;
 
 @Mod(modid= SimpleMod.ID, name= SimpleMod.NAME, version = SimpleMod.VERSION)
 public class SimpleMod {
-	public static final String ID = "xaeroxe_jayperdu_acm";
+	public static final String ID = "jayperdu_simple";
 	public static final String NAME = "Simple Mod";
-	public static final String VERSION = "1.8-11.14.3.1450-forge";
+	public static final String VERSION = "2.0_minecraft-1.8";
 
 	@Mod.Instance(value = SimpleMod.ID)
 	public static SimpleMod INSTANCE;
@@ -64,7 +66,7 @@ public class SimpleMod {
 			RenderItem renderItem = Minecraft.getMinecraft().getRenderItem();
 			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.light_block), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockLight.NAME, "inventory"));
 			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.crafting_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockCraftingChest.NAME, "inventory"));
-			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.christmas_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockCraftingChest.NAME, "inventory"));
+			renderItem.getItemModelMesher().register(Item.getItemFromBlock(SimpleBlocks.christmas_chest), 0, new ModelResourceLocation(SimpleMod.ID + ":" + BlockChristmasChest.NAME, "inventory"));
 			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityCraftingChest.class, new TileEntityCraftingChestRenderer());
 			ClientRegistry.bindTileEntitySpecialRenderer(TileEntityChristmasChest.class, new TileEntityChristmasChestRenderer());
 		}
