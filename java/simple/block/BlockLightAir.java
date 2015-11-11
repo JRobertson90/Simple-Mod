@@ -8,7 +8,6 @@ import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.*;
 import net.minecraft.util.*;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class BlockLightAir extends Block {
 
@@ -26,7 +25,6 @@ public class BlockLightAir extends Block {
 		} else {
 			setBlockBounds(0F, 0F, 0F, 0F, 0F, 0F);
 		}
-		GameRegistry.registerBlock(this, NAME);
 	}
 	
 	@Override

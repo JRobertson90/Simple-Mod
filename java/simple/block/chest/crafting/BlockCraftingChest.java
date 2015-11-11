@@ -33,10 +33,7 @@ public class BlockCraftingChest extends BlockContainer
         setCreativeTab(CreativeTabs.tabBlock);
         setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
         setBlockBounds(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
-        GameRegistry.registerBlock(this, NAME);
-        GameRegistry.registerTileEntity(TileEntityCraftingChest.class, "crafting_chest_tile");
-        GameRegistry.addRecipe(new ItemStack(this, 1), "XXX", "X#X", "XXX", 'X', Blocks.planks, '#', Blocks.crafting_table);
-        GameRegistry.addShapelessRecipe(new ItemStack(this, 1), Blocks.chest, Blocks.crafting_table);
+
     }
 
     @Override public boolean canPlaceBlockAt(World worldIn, BlockPos pos) { return true; }

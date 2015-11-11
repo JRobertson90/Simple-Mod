@@ -5,12 +5,8 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.*;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.*;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,8 +30,6 @@ public class BlockLight extends Block {
 		setHardness(1.5F);
 		setUnlocalizedName(SimpleMod.ID + ":" + NAME);
 		setCreativeTab(CreativeTabs.tabBlock);
-		GameRegistry.registerBlock(this, NAME);
-		GameRegistry.addRecipe(new ItemStack(this, 4), "###", "#Q#", "###", '#', Items.glowstone_dust, 'Q', Blocks.quartz_block);
 	}
 
 	@Override
